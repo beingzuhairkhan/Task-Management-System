@@ -138,7 +138,7 @@ export class SubtasksService {
                 ([key, value]) =>
                     `${key}: ${value}`,
             )
-            .join(', ');
+            .join(', ')
 
 
         await this.activityService.log({
