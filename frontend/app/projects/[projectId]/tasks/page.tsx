@@ -16,7 +16,7 @@ import {
   type TaskDialogState,
 } from "@/components/tasks/task-dialog";
 
-import type { Priority } from "@/lib/tasks-data";
+import  { TaskPriority } from "@/lib/tasks-data";
 
 export default function DashboardPage() {
   const [view, setView] =
@@ -39,7 +39,7 @@ export default function DashboardPage() {
   ]);
 
   const [priorityFilter, setPriorityFilter] =
-    useState<Priority | "All">("All");
+    useState<TaskPriority | "All">("All");
 
   const toggleField = (field: string) => {
     setFields((previous) =>

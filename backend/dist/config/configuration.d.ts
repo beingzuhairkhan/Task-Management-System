@@ -24,4 +24,5 @@ export declare const config: () => {
         password: string;
         from: string;
     };
+    redis: string;
 };

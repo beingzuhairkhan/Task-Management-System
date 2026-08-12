@@ -20,10 +20,11 @@ import {
   type ProjectDialogState,
 } from "@/components/projects/project-dialog";
 
-import { useProjects, projectStatuses } from "@/lib/projects-store";
-import { priorities, type Priority } from "@/lib/tasks-data";
+import { useProjects, ProjectStatus , projectStatuses } from "@/lib/projects-store";
+import { priorities, TaskPriority } from "@/lib/tasks-data";
 import { cn } from "@/lib/utils";
 import { projectAPI } from "@/services/api";
+import type {ProjectPriority} from "@/services/api";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -51,7 +52,7 @@ export default function ProjectsPage() {
   const [visible, setVisible] = useState<Column[]>([...columns]);
 
   const [priorityFilter, setPriorityFilter] =
-    useState<Priority | "All">("All");
+    useState<TaskPriority | "All">("All");
 
   const [statusFilter, setStatusFilter] = useState("All");
 
@@ -80,12 +81,12 @@ export default function ProjectsPage() {
           priority:
             priorityFilter === "All"
               ? undefined
-              : priorityFilter.toUpperCase(),
+              : (priorityFilter.toUpperCase() as ProjectPriority),
 
           status:
             statusFilter === "All"
               ? undefined
-              : statusFilter.toUpperCase(),
+              :(statusFilter.toUpperCase() as ProjectStatus),
         });
 
         console.log("Projects API response:", response.data);
@@ -157,7 +158,8 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex min-h-screen">
-      <AppSidebar open={sidebarOpen} />
+      <AppSidebar open
+                active="projects"/>
 
       <main className="flex-1">
         <div className="border-b border-border">

@@ -102,6 +102,7 @@ export type User = {
     username: string;
     avatar?: string;
     email?: string;
+    jobTitle?:string;
 };
 
 export type Subtask = {

@@ -21,9 +21,6 @@ async function bootstrap() {
         origin: configService.get('clientUrl') || '*',
         credentials: true,
     });
-    const express = require('express');
-    const path = require('path');
-    app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Task Management API')
         .setDescription('A production-ready Task Management System API (ClickUp/Jira-like) with Google OAuth, JWT auth, projects, groups, tasks, subtasks, comments, labels, attachments, and activity logging.')
@@ -32,12 +29,10 @@ async function bootstrap() {
         .addTag('Auth', 'Google OAuth & JWT authentication')
         .addTag('Users', 'User management')
         .addTag('Projects', 'Project CRUD & member management')
-        .addTag('Groups', 'Board column management')
         .addTag('Tasks', 'Task CRUD, assignment, drag & drop ordering')
         .addTag('Subtasks', 'Subtask management')
         .addTag('Comments', 'Task comments')
         .addTag('Labels', 'Project labels')
-        .addTag('Attachments', 'File uploads')
         .addTag('Activity', 'Activity logging')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);

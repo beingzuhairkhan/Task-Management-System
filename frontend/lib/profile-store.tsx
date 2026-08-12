@@ -18,6 +18,7 @@ export type Profile = {
   avatar: string;
   jobTitle:string;
   fullName:string;
+  initials?: string;
 };
 
 const STORAGE_KEY = "dexter.profile.v1";

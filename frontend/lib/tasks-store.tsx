@@ -13,7 +13,7 @@ import { useParams } from "next/navigation";
 
 import { taskAPI } from "@/services/api";
 import type { Task } from "@/lib/tasks-data";
-
+import { groups } from "@/lib/tasks-data";
 type TasksContextValue = {
   tasks: Task[];
   loading: boolean;
@@ -73,11 +73,11 @@ export function TasksProvider({
 
   // Get tasks by group
   const tasksByGroup = useCallback(
-    (groupId: string) => {
-      return tasks.filter((task) => task.groupId === groupId);
-    },
-    [tasks],
-  );
+  (groupId: string) => {
+    return tasks.filter((task) => task.group === groupId);
+  },
+  [tasks],
+);
 
   // Create task
   const createTask = useCallback(
@@ -109,15 +109,14 @@ export function TasksProvider({
         throw new Error("Task not found");
       }
 
-      // Don't move if already in the same group
-      if (currentTask.groupId === groupId) {
-        return;
-      }
+      if (currentTask.group === groupId) {
+  return;
+}
 
       try {
    
         await taskAPI.moveTask(projectId, taskId, {
-          groupId,
+           groupId,
         });
 
         

@@ -16,12 +16,10 @@ const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const users_module_1 = require("./users/users.module");
 const auth_module_1 = require("./auth/auth.module");
 const projects_module_1 = require("./projects/projects.module");
-const groups_module_1 = require("./groups/groups.module");
 const tasks_module_1 = require("./tasks/tasks.module");
 const subtasks_module_1 = require("./subtasks/subtasks.module");
 const comments_module_1 = require("./comments/comments.module");
 const labels_module_1 = require("./labels/labels.module");
-const attachments_module_1 = require("./attachments/attachments.module");
 const activity_module_1 = require("./activity/activity.module");
 let AppModule = class AppModule {
 };
@@ -37,12 +35,10 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             projects_module_1.ProjectsModule,
-            groups_module_1.GroupsModule,
             tasks_module_1.TasksModule,
             subtasks_module_1.SubtasksModule,
             comments_module_1.CommentsModule,
             labels_module_1.LabelsModule,
-            attachments_module_1.AttachmentsModule,
             activity_module_1.ActivityModule,
         ],
         providers: [

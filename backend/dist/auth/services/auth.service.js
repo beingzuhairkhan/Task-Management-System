@@ -17,7 +17,7 @@ let AuthService = class AuthService {
     constructor(userRepository) {
         this.userRepository = userRepository;
         this.redisClient = (0, redis_1.createClient)({
-            url: "rediss://default:gQAAAAAAAutcAAIgcDFhMWFhMjU1NDA0ZGE0YzE1OGJlYTA0ZjE5MzdjZjgyZg@cheerful-kitten-191324.upstash.io:6379",
+            url: process.env.REDIS_URL,
         });
         this.redisClient.on('error', (err) => {
             console.error('Redis Error:', err);
@@ -74,8 +74,8 @@ let AuthService = class AuthService {
             const result = await this.redisClient.set(key, '1', {
                 EX: expiresIn,
             });
-            const storedValue = await this.redisClient.get(key);
-            const ttl = await this.redisClient.ttl(key);
+            await this.redisClient.get(key);
+            await this.redisClient.ttl(key);
             return {
                 message: 'Logged out successfully',
             };

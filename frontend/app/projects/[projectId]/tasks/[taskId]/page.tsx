@@ -48,12 +48,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { AppSidebar } from "@/components/tasks/app-sidebar";
 import { Updates } from "@/components/tasks/taskUpdates";
 import {
-    allMembers,
     groups,
     priorities,
     statusOptions,
-    type TaskPriority,
+     TaskPriority,
 } from "@/lib/tasks-data";
+
 
 import { SubtasksSection } from "@/components/tasks/SubtasksSection";
 
@@ -610,7 +610,7 @@ export default function TaskDetailPage() {
                 ...task.members,
                 {
                     id: member.id,
-                    username: member.username ?? member.name,
+                    username: member.username ,
                     avatar: member.avatar,
                     email: member.email,
                 },
@@ -1377,7 +1377,7 @@ export default function TaskDetailPage() {
                                                                 updateTask(
                                                                     {
                                                                         priority:
-                                                                            priority as Priority,
+                                                                            priority as TaskPriority,
                                                                     },
                                                                 )
                                                             }

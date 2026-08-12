@@ -36,6 +36,7 @@ const config = () => ({
             process.env.MAIL_USER ||
             '',
     },
+    redis: process.env.REDIS_URL
 });
 exports.config = config;
 //# sourceMappingURL=configuration.js.map

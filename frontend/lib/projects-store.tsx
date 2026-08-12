@@ -10,6 +10,7 @@ import {
     type ReactNode,
 } from "react";
 
+import { TaskPriority } from "@/lib/tasks-data";
 import type { Member } from "@/lib/tasks-data";
 
 
@@ -154,8 +155,8 @@ export function ProjectsProvider({
                         "",
 
                     priority:
-                        input.priority ??
-                        "Medium",
+                     input.priority ??
+                      TaskPriority.MEDIUM,
 
                     status:
                         input.status ??

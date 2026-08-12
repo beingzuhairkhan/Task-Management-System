@@ -131,9 +131,6 @@ authAPI.interceptors.response.use(
   }
 );
 
-/* =========================
-   TYPES
-========================= */
 
 export type ProjectPriority =
   | "LOW"
@@ -142,11 +139,7 @@ export type ProjectPriority =
   | "URGENT"
   | "NO_PRIORITY";
 
-export type ProjectStatus =
-  | "PLANNING"
-  | "ACTIVE"
-  | "PAUSED"
-  | "SHIPPED";
+
 
 export type ProjectRole =
   | "OWNER"
@@ -379,7 +372,7 @@ export const taskAPI = {
     projectId: string,
     taskId: string,
     data: {
-      group: string;
+      groupId: string;
     },
   ) => {
     return authAPI.patch(

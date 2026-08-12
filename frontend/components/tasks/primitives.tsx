@@ -133,6 +133,15 @@ const groupDot: Record<string, string> = {
   hold: "bg-group-hold",
 };
 
-export function GroupDot({ tone }: { tone: string }) {
-  return <span className={cn("size-2 rounded-full", groupDot[tone])} />;
+type GroupTone = keyof typeof groupDot;
+
+export function GroupDot({ tone }: { tone: GroupTone }) {
+  return (
+    <span
+      className={cn(
+        "size-2 rounded-full",
+        groupDot[tone]
+      )}
+    />
+  );
 }
