@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
 } from "axios";
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
 interface AxiosRequestConfigWithRetry
   extends AxiosRequestConfig {
