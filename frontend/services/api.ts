@@ -7,7 +7,7 @@ import type {
 } from "axios";
 
 const API_BASE_URL =
-  (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000") + "/api";
+  (process.env.NEXT_PUBLIC_BACKEND_URL) + "/api";
 
 interface AxiosRequestConfigWithRetry
   extends AxiosRequestConfig {
