@@ -163,7 +163,9 @@ export type Task = {
 
 
 export type SubtasksSectionProps = {
-    subtasks: Subtask[];
-    taskId: string;
-    onDeleteSubtask: (subtaskId: string) => void;
+  subtasks: Subtask[];
+  taskId?: string;
+  onAddSubtask?: (data: any) => void;
+  onUpdateSubtask?: (subtaskId: string, data: any) => void;
+  onDeleteSubtask?: (subtaskId: string) => Promise<void>;
 };

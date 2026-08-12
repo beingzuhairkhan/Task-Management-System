@@ -179,24 +179,24 @@ export interface Project {
 }
 
 
-export interface CreateProjectDto {
-  title: string;
-  description?: string;
-  priority?: ProjectPriority;
-  status?: ProjectStatus;
-  lead: string;
-  dueDate: string;
-}
+// export interface CreateProjectDto {
+//   title: string;
+//   description?: string;
+//   priority?: ProjectPriority;
+//   status?: ProjectStatus;
+//   lead: string;
+//   dueDate: string;
+// }
 
 
-export interface UpdateProjectDto {
-  title?: string;
-  description?: string;
-  priority?: ProjectPriority;
-  status?: ProjectStatus;
-  lead?: string;
-  dueDate?: string;
-}
+// export interface UpdateProjectDto {
+//   title?: string;
+//   description?: string;
+//   priority?: string;
+//   status?: string;
+//   lead?: string;
+//   dueDate?: string;
+// }
 
 
 export interface InviteMemberDto {
@@ -237,7 +237,7 @@ type UpdateUserData = {
 export const projectAPI = {
 
   createProject: (
-    data: CreateProjectDto
+    data: any
   ): Promise<AxiosResponse<Project>> => {
     return authAPI.post(
       "/projects",
@@ -263,7 +263,7 @@ export const projectAPI = {
 
   updateProjectById: (
     id: string,
-    data: UpdateProjectDto
+    data: any
   ): Promise<AxiosResponse<Project>> => {
     return authAPI.patch(
       `/projects/${id}`,

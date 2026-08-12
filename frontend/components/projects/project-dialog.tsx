@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   TaskPriority,
 } from "@/lib/tasks-data";
@@ -184,7 +183,7 @@ export function ProjectDialog({
 
     if (!lead || !due) return;
 
-    const payload = {
+    const payload  = {
       title: name.trim(),
       description: description.trim(),
       status: status

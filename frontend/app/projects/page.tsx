@@ -268,7 +268,7 @@ export default function ProjectsPage() {
                   className="justify-between"
                   onSelect={() =>
                     setPriorityFilter(
-                      p as Priority | "All",
+                      p as any | "All",
                     )
                   }
                 >

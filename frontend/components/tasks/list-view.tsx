@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { groups, type Priority } from "@/lib/tasks-data";
+import { groups,  TaskPriority } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
 
 import {
@@ -23,7 +23,7 @@ type ListViewProps = {
   query: string;
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
-  priorityFilter: Priority | "All";
+  priorityFilter: TaskPriority | "All";
 };
 
 export function ListView({
@@ -119,7 +119,7 @@ export function ListView({
                 )}
               />
 
-              <GroupDot groupId={group.id} />
+              <GroupDot tone={group.tone} />
 
               <span>{group.name}</span>
 

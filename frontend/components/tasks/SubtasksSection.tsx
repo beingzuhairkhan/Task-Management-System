@@ -28,12 +28,11 @@ import {
 
 import type {
     SubtasksSectionProps,
-    Priority,
     Subtask,
 } from "@/lib/tasks-data";
 
 import {
-    priorities,
+    priorities,TaskPriority
 } from "@/lib/tasks-data";
 
 import { formatDate } from "@/lib/date-utils";
@@ -74,7 +73,7 @@ export function SubtasksSection({
     const handleAddSubtask = () => {
         setDialog({
             mode: "create",
-            type: "subtask",
+            // type: "subtask",
         });
     };
 
@@ -112,7 +111,9 @@ export function SubtasksSection({
                     .replace(/\s+/g, "_");
             }
 
-
+if (!taskId) {
+  return;
+}
 
             await subTaskAPI.updateSubTaskById(
                 taskId,
@@ -225,7 +226,7 @@ export function SubtasksSection({
 
 
 
-                        {subtasks.map((subtask) => {
+                        {subtasks.map((subtask: any) => {
 
                             const isUpdating =
                                 updatingSubtaskId ===
@@ -360,7 +361,7 @@ export function SubtasksSection({
 
                                                     <PriorityTag
                                                         priority={
-                                                            subtask.priority as Priority
+                                                            subtask.priority as TaskPriority
                                                         }
                                                     />
 
@@ -415,7 +416,7 @@ export function SubtasksSection({
 
                                                                 <PriorityTag
                                                                     priority={
-                                                                        normalizedPriority as Priority
+                                                                        normalizedPriority as TaskPriority
                                                                     }
                                                                 />
 
@@ -479,10 +480,10 @@ export function SubtasksSection({
                                             type="button"
                                             aria-label={`Delete ${subtask.title}`}
                                             onClick={() =>
-                                                onDeleteSubtask(
-                                                    subtask.id,
-                                                )
-                                            }
+  onDeleteSubtask?.(
+    subtask.id,
+  )
+}
                                             disabled={isUpdating}
                                             className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
                                         >

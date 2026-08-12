@@ -22,6 +22,7 @@ type TasksContextValue = {
   fetchTasks: () => Promise<void>;
   createTask: (data: any) => Promise<void>;
   moveTask: (taskId: string, groupId: string) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
 };
 
 const TasksContext = createContext<TasksContextValue | null>(null);
@@ -93,6 +94,21 @@ export function TasksProvider({
     [projectId, fetchTasks],
   );
 
+  const deleteTask = useCallback(
+  async (taskId: string) => {
+    if (!projectId) {
+      throw new Error("Project ID is missing");
+    }
+
+    await taskAPI.deleteTask(projectId, taskId);
+
+    setTasks((currentTasks) =>
+      currentTasks.filter((task) => task.id !== taskId),
+    );
+  },
+  [projectId],
+);
+
   // Move task
   const moveTask = useCallback(
     async (taskId: string, groupId: string) => {
@@ -147,6 +163,7 @@ export function TasksProvider({
       tasksByGroup,
       createTask,
       moveTask,
+      deleteTask
     }),
     [
       tasks,
@@ -156,6 +173,7 @@ export function TasksProvider({
       tasksByGroup,
       createTask,
       moveTask,
+      deleteTask
     ],
   );
 

@@ -1,7 +1,7 @@
 import { ChevronUp, ChevronsUp, Minus, ChevronDown, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Member, Priority } from "@/lib/tasks-data";
-
+import type { Member } from "@/lib/tasks-data";
+import  {  TaskPriority } from "@/lib/tasks-data";
 const toneClasses: Record<Member["tone"], string> = {
   violet: "bg-avatar-violet text-avatar-violet-foreground",
   amber: "bg-avatar-amber text-avatar-amber-foreground",
@@ -100,15 +100,15 @@ export function MemberStack({
 }
 
 
-const priorityMeta: Record<Priority, { className: string; Icon: typeof ChevronUp }> = {
+const priorityMeta = {
   URGENT: { className: "text-priority-urgent", Icon: ChevronsUp },
   HIGH: { className: "text-priority-high", Icon: ChevronUp },
   MEDIUM: { className: "text-priority-medium", Icon: Minus },
   LOW: { className: "text-priority-low", Icon: ChevronDown },
   "No Priority": { className: "text-muted-foreground", Icon: Circle },
-};
+} as any;
 
-export function PriorityTag({ priority }: { priority: Priority }) {
+export function PriorityTag({ priority }: { priority: TaskPriority }) {
   const { className, Icon } = priorityMeta[priority] ?? priorityMeta["No Priority"];
   return (
     <span className={cn("inline-flex items-center gap-1 text-xs font-medium", className)}>

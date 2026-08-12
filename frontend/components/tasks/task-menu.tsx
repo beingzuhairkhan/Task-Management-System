@@ -52,9 +52,9 @@ const { deleteTask, moveTask } = useTasks();
   };
 
 const handleMove = async (groupId: string) => {
-  if (groupId === task.groupId) {
-    return;
-  }
+ if (groupId === task.group) {
+  return;
+}
 
   try {
     await moveTask(task.id, groupId);
@@ -106,7 +106,7 @@ const handleMove = async (groupId: string) => {
             {groups.map((group) => (
               <DropdownMenuItem
                 key={group.id}
-                disabled={group.id === task.groupId}
+                disabled={group.id === task.group}
                 onSelect={() => handleMove(group.id)}
               >
                 {group.name}

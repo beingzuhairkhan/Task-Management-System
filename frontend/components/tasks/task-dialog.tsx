@@ -23,7 +23,7 @@ import {
   groups,
   priorities,
   TaskStatus,
-  type Priority,
+   TaskPriority,
   type Task,
 } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
@@ -60,14 +60,14 @@ export function TaskDialog({
   state: TaskDialogState | null;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { updateTask } = useTasks();
+  // const { updateTask } = useTasks();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const [groupId, setGroupId] = useState("TODO");
 
-  const [priority, setPriority] = useState<Priority>("MEDIUM");
+  const [priority, setPriority] = useState<any>("MEDIUM");
 
   const [status, setStatus] = useState<TaskStatus>(
     TaskStatus.PLANNED,
@@ -251,7 +251,7 @@ export function TaskDialog({
 
     try {
       if (state?.mode === "edit") {
-        await updateTask(state.task.id, payload);
+        // await updateTask(state.task.id, payload);
         toast.success("Task updated successfully");
       } else {
         await taskAPI.createTask(projectId, payload);
@@ -371,7 +371,7 @@ export function TaskDialog({
                 value={priority}
                 onValueChange={(value) =>
                   setPriority(
-                    value as Priority,
+                    value as TaskPriority,
                   )
                 }
               >

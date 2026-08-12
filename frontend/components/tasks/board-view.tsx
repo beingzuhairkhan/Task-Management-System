@@ -10,7 +10,7 @@ import {
 
 import {
   groups,
-  type Priority,
+   TaskPriority,
 } from "@/lib/tasks-data";
 
 import { useTasks } from "@/lib/tasks-store";
@@ -29,7 +29,7 @@ type BoardViewProps = {
   query: string;
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
-  priorityFilter: Priority | "All";
+  priorityFilter: TaskPriority | "All";
 };
 
 export function BoardView({
@@ -101,7 +101,7 @@ export function BoardView({
             >
               {/* Group Header */}
               <div className="flex items-center gap-2  px-3 py-2.5">
-                <GroupDot groupId={group.id} />
+                <GroupDot tone={group.tone} />
 
                 <h2 className="text-sm font-semibold">
                   {group.name}

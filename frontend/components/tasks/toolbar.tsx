@@ -11,7 +11,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fieldOptions, priorities, type Priority } from "@/lib/tasks-data";
+import { fieldOptions, priorities,  TaskPriority } from "@/lib/tasks-data";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,8 +43,8 @@ export function Toolbar({
   onAddTask: () => void;
   fields: string[];
   onToggleField: (f: string) => void;
-  priorityFilter: Priority | "All";
-  onPriorityFilterChange: (p: Priority | "All") => void;
+  priorityFilter: TaskPriority | "All";
+  onPriorityFilterChange: (p: TaskPriority | "All") => void;
 }) {
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -137,7 +137,7 @@ export function Toolbar({
               <DropdownMenuItem
                 key={p}
                 className="justify-between"
-                onSelect={() => onPriorityFilterChange(p as Priority | "All")}
+                onSelect={() => onPriorityFilterChange(p as TaskPriority | "All")}
               >
                 {p}
                 {priorityFilter === p && <Check className="size-4 text-primary" />}
