@@ -104,8 +104,47 @@ export class TasksService {
         );
       }
 
+      // Log title change
+      if (dto.title !== undefined && dto.title !== existing.title) {
+        await this.activityService.log({
+          taskId: id,
+          userId,
+          action: ActivityAction.UPDATED,
+          oldValue: existing.title,
+          newValue: dto.title,
+        });
+      }
+
+      // Log description change
+      if (
+        dto.description !== undefined &&
+        dto.description !== existing.description
+      ) {
+        await this.activityService.log({
+          taskId: id,
+          userId,
+          action: ActivityAction.UPDATED,
+          oldValue: existing.description || '',
+          newValue: dto.description,
+        });
+      }
+
+      // Log reporter change
+      if (
+        dto.reporter !== undefined &&
+        String(dto.reporter) !== String(existing.reporter)
+      ) {
+        await this.activityService.log({
+          taskId: id,
+          userId,
+          action: ActivityAction.UPDATED,
+          oldValue: String(existing.reporter),
+          newValue: String(dto.reporter),
+        });
+      }
+
       // Log status change
-      if (dto.status && dto.status !== existing.status) {
+      if (dto.status !== undefined && dto.status !== existing.status) {
         await this.activityService.log({
           taskId: id,
           userId,
@@ -116,7 +155,7 @@ export class TasksService {
       }
 
       // Log priority change
-      if (dto.priority && dto.priority !== existing.priority) {
+      if (dto.priority !== undefined && dto.priority !== existing.priority) {
         await this.activityService.log({
           taskId: id,
           userId,
@@ -127,7 +166,7 @@ export class TasksService {
       }
 
       // Log group movement
-      if (dto.group && dto.group !== existing.group) {
+      if (dto.group !== undefined && dto.group !== existing.group) {
         await this.activityService.log({
           taskId: id,
           userId,
@@ -142,6 +181,18 @@ export class TasksService {
       } = {
         updatedBy: new Types.ObjectId(userId),
       };
+
+      if (dto.title !== undefined) {
+        updateData.title = dto.title;
+      }
+
+      if (dto.description !== undefined) {
+        updateData.description = dto.description;
+      }
+
+      if (dto.reporter !== undefined) {
+        updateData.reporter = new Types.ObjectId(dto.reporter);
+      }
 
       if (dto.status !== undefined) {
         updateData.status = dto.status;
@@ -170,11 +221,13 @@ export class TasksService {
       }
 
       const task = await this.taskRepository.update(id, updateData);
+
       await this.activityService.log({
         taskId: id,
         userId,
         action: ActivityAction.UPDATED,
       });
+
       return task;
     } catch (err) {
       throw err;

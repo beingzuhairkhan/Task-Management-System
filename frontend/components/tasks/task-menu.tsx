@@ -48,7 +48,7 @@ const { deleteTask, moveTask } = useTasks();
   const projectId = params.projectId;
 
   const handleOpenDetails = () => {
-    router.push(`/task/${task.id}`);
+    router.push(`/projects/${projectId}/tasks/${task.id}`);
   };
 
 const handleMove = async (groupId: string) => {

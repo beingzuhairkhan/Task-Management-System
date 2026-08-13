@@ -23,7 +23,7 @@ import {
   groups,
   priorities,
   TaskStatus,
-   TaskPriority,
+  TaskPriority,
   type Task,
 } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
@@ -67,7 +67,9 @@ export function TaskDialog({
 
   const [groupId, setGroupId] = useState("TODO");
 
-  const [priority, setPriority] = useState<any>("MEDIUM");
+  const [priority, setPriority] = useState<TaskPriority>(
+    TaskPriority.MEDIUM
+  );
 
   const [status, setStatus] = useState<TaskStatus>(
     TaskStatus.PLANNED,
@@ -121,6 +123,51 @@ export function TaskDialog({
     loadData();
   }, []);
 
+  const normalizePriority = (
+  value?: string
+): TaskPriority => {
+  switch (value?.toUpperCase()) {
+    case "LOW":
+      return TaskPriority.LOW;
+
+    case "HIGH":
+      return TaskPriority.HIGH;
+
+    case "URGENT":
+      return TaskPriority.URGENT;
+
+    case "NO_PRIORITY":
+    case "NO PRIORITY":
+      return TaskPriority.NO_PRIORITY;
+
+    case "MEDIUM":
+    default:
+      return TaskPriority.MEDIUM;
+  }
+};
+
+const normalizeStatus = (
+  value?: string
+): TaskStatus => {
+  switch (value?.toUpperCase()) {
+    case "BACKLOG":
+      return TaskStatus.BACKLOG;
+
+    case "IN_PROGRESS":
+    case "IN PROGRESS":
+      return TaskStatus.IN_PROGRESS;
+
+    case "BLOCKED":
+      return TaskStatus.BLOCKED;
+
+    case "DONE":
+      return TaskStatus.DONE;
+
+    case "PLANNED":
+    default:
+      return TaskStatus.PLANNED;
+  }
+};
 
   useEffect(() => {
     if (!state) return;
@@ -138,12 +185,12 @@ export function TaskDialog({
       );
 
       setPriority(
-        task.priority ?? "MEDIUM",
-      );
+  normalizePriority(task.priority)
+);
 
       setStatus(
-        task.status ?? TaskStatus.PLANNED,
-      );
+  normalizeStatus(task.status)
+);
 
       setDue(
         task.dueDate ??
@@ -151,7 +198,7 @@ export function TaskDialog({
         "",
       );
 
-  
+
       setReporter(
         typeof task.reporter === "string"
           ? task.reporter
@@ -160,7 +207,7 @@ export function TaskDialog({
           "",
       );
 
-  
+
       setMembers(
         (task.members ?? []).map(
           (member: any) =>
@@ -190,7 +237,7 @@ export function TaskDialog({
         "TODO",
       );
 
-      setPriority("MEDIUM");
+      setPriority(TaskPriority.MEDIUM);
       setStatus(TaskStatus.PLANNED);
 
       setDue("");
@@ -201,7 +248,7 @@ export function TaskDialog({
     }
   }, [state]);
 
- 
+
   const toggle = (
     list: string[],
     set: (value: string[]) => void,
@@ -251,7 +298,7 @@ export function TaskDialog({
 
     try {
       if (state?.mode === "edit") {
-        // await updateTask(state.task.id, payload);
+        await taskAPI.updateTaskById(projectId, state.task.id, payload);
         toast.success("Task updated successfully");
       } else {
         await taskAPI.createTask(projectId, payload);
@@ -367,31 +414,25 @@ export function TaskDialog({
                 Priority
               </Label>
 
-              <Select
-                value={priority}
-                onValueChange={(value) =>
-                  setPriority(
-                    value as TaskPriority,
-                  )
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+             <Select
+  value={priority}
+  onValueChange={(value) => {
+    console.log("Selected priority:", value);
+    setPriority(value as TaskPriority);
+  }}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Select priority" />
+  </SelectTrigger>
 
-                <SelectContent>
-                  {priorities.map(
-                    (priority) => (
-                      <SelectItem
-                        key={priority}
-                        value={priority}
-                      >
-                        {priority}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
+  <SelectContent>
+    {Object.values(TaskPriority).map((item) => (
+      <SelectItem key={item} value={item}>
+        {item}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
             </div>
           </div>
 

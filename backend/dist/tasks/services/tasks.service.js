@@ -77,7 +77,36 @@ let TasksService = class TasksService {
             if (!isMember && !isCreator && !isReporter) {
                 throw new common_2.ForbiddenException('Only members, the task creator, or the reporter can update this task');
             }
-            if (dto.status && dto.status !== existing.status) {
+            if (dto.title !== undefined && dto.title !== existing.title) {
+                await this.activityService.log({
+                    taskId: id,
+                    userId,
+                    action: enums_1.ActivityAction.UPDATED,
+                    oldValue: existing.title,
+                    newValue: dto.title,
+                });
+            }
+            if (dto.description !== undefined &&
+                dto.description !== existing.description) {
+                await this.activityService.log({
+                    taskId: id,
+                    userId,
+                    action: enums_1.ActivityAction.UPDATED,
+                    oldValue: existing.description || '',
+                    newValue: dto.description,
+                });
+            }
+            if (dto.reporter !== undefined &&
+                String(dto.reporter) !== String(existing.reporter)) {
+                await this.activityService.log({
+                    taskId: id,
+                    userId,
+                    action: enums_1.ActivityAction.UPDATED,
+                    oldValue: String(existing.reporter),
+                    newValue: String(dto.reporter),
+                });
+            }
+            if (dto.status !== undefined && dto.status !== existing.status) {
                 await this.activityService.log({
                     taskId: id,
                     userId,
@@ -86,7 +115,7 @@ let TasksService = class TasksService {
                     newValue: dto.status,
                 });
             }
-            if (dto.priority && dto.priority !== existing.priority) {
+            if (dto.priority !== undefined && dto.priority !== existing.priority) {
                 await this.activityService.log({
                     taskId: id,
                     userId,
@@ -95,7 +124,7 @@ let TasksService = class TasksService {
                     newValue: dto.priority,
                 });
             }
-            if (dto.group && dto.group !== existing.group) {
+            if (dto.group !== undefined && dto.group !== existing.group) {
                 await this.activityService.log({
                     taskId: id,
                     userId,
@@ -107,6 +136,15 @@ let TasksService = class TasksService {
             const updateData = {
                 updatedBy: new mongoose_1.Types.ObjectId(userId),
             };
+            if (dto.title !== undefined) {
+                updateData.title = dto.title;
+            }
+            if (dto.description !== undefined) {
+                updateData.description = dto.description;
+            }
+            if (dto.reporter !== undefined) {
+                updateData.reporter = new mongoose_1.Types.ObjectId(dto.reporter);
+            }
             if (dto.status !== undefined) {
                 updateData.status = dto.status;
             }
