@@ -1,7 +1,8 @@
 import { ChevronUp, ChevronsUp, Minus, ChevronDown, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Member } from "@/lib/tasks-data";
-import  {  TaskPriority } from "@/lib/tasks-data";
+import  {  TaskPriority , TaskStatus } from "@/lib/tasks-data";
+
 const toneClasses: Record<Member["tone"], string> = {
   violet: "bg-avatar-violet text-avatar-violet-foreground",
   amber: "bg-avatar-amber text-avatar-amber-foreground",
@@ -118,9 +119,37 @@ export function PriorityTag({ priority }: { priority: TaskPriority }) {
   );
 }
 
-export function LabelChip({ children }: { children: React.ReactNode }) {
+export function LabelChip({
+  children,
+  status,
+}: {
+  children: React.ReactNode;
+  status?: TaskStatus;
+}) {
   return (
-    <span className="inline-flex items-center rounded-md border border-border bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+    <span
+      className={cn(
+        "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-medium",
+
+        status === TaskStatus.PLANNED &&
+          "border-blue-500/30 bg-blue-500/10 text-blue-600",
+
+        status === TaskStatus.BACKLOG &&
+          "border-slate-500/30 bg-slate-500/10 text-slate-600",
+
+        status === TaskStatus.IN_PROGRESS &&
+          "border-yellow-500/30 bg-yellow-500/10 text-yellow-600",
+
+        status === TaskStatus.BLOCKED &&
+          "border-red-500/30 bg-red-500/10 text-red-600",
+
+        status === TaskStatus.DONE &&
+          "border-green-500/30 bg-green-500/10 text-green-600",
+
+        !status &&
+          "border-border bg-muted text-muted-foreground",
+      )}
+    >
       {children}
     </span>
   );

@@ -217,9 +217,9 @@ export function ListView({
                         {/* Status */}
                         {show("Status") && (
                           <td className="hidden px-4 py-2.5 md:table-cell">
-                            <LabelChip>
-                              {task.status}
-                            </LabelChip>
+                            <LabelChip status={task.status}>
+  {task.status}
+</LabelChip>
                           </td>
                         )}
 

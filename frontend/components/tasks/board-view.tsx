@@ -25,6 +25,7 @@ import {
 import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
 import { useParams } from "next/navigation";
+import {normalizeStatus} from "./task-dialog"
 type BoardViewProps = {
   query: string;
   onDialog: (state: TaskDialogState) => void;
@@ -222,9 +223,9 @@ export function BoardView({
                           )}
 
                           {show("Status") && (
-                            <LabelChip>
-                              {task.status}
-                            </LabelChip>
+                            <LabelChip status={normalizeStatus(task.status)}>
+  {task.status}
+</LabelChip>
                           )}
 
                           {show("Labels") &&

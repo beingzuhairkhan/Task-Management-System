@@ -53,6 +53,29 @@ interface LabelOption {
   name: string;
 }
 
+  export const normalizeStatus = (
+    value?: string
+  ): TaskStatus => {
+    switch (value?.toUpperCase()) {
+      case "BACKLOG":
+        return TaskStatus.BACKLOG;
+
+      case "IN_PROGRESS":
+      case "IN PROGRESS":
+        return TaskStatus.IN_PROGRESS;
+
+      case "BLOCKED":
+        return TaskStatus.BLOCKED;
+
+      case "DONE":
+        return TaskStatus.DONE;
+
+      case "PLANNED":
+      default:
+        return TaskStatus.PLANNED;
+    }
+  };
+
 export function TaskDialog({
   state,
   onOpenChange,
@@ -124,50 +147,29 @@ export function TaskDialog({
   }, []);
 
   const normalizePriority = (
-  value?: string
-): TaskPriority => {
-  switch (value?.toUpperCase()) {
-    case "LOW":
-      return TaskPriority.LOW;
+    value?: string
+  ): TaskPriority => {
+    switch (value?.toUpperCase()) {
+      case "LOW":
+        return TaskPriority.LOW;
 
-    case "HIGH":
-      return TaskPriority.HIGH;
+      case "HIGH":
+        return TaskPriority.HIGH;
 
-    case "URGENT":
-      return TaskPriority.URGENT;
+      case "URGENT":
+        return TaskPriority.URGENT;
 
-    case "NO_PRIORITY":
-    case "NO PRIORITY":
-      return TaskPriority.NO_PRIORITY;
+      case "NO_PRIORITY":
+      case "NO PRIORITY":
+        return TaskPriority.NO_PRIORITY;
 
-    case "MEDIUM":
-    default:
-      return TaskPriority.MEDIUM;
-  }
-};
+      case "MEDIUM":
+      default:
+        return TaskPriority.MEDIUM;
+    }
+  };
 
-const normalizeStatus = (
-  value?: string
-): TaskStatus => {
-  switch (value?.toUpperCase()) {
-    case "BACKLOG":
-      return TaskStatus.BACKLOG;
 
-    case "IN_PROGRESS":
-    case "IN PROGRESS":
-      return TaskStatus.IN_PROGRESS;
-
-    case "BLOCKED":
-      return TaskStatus.BLOCKED;
-
-    case "DONE":
-      return TaskStatus.DONE;
-
-    case "PLANNED":
-    default:
-      return TaskStatus.PLANNED;
-  }
-};
 
   useEffect(() => {
     if (!state) return;
@@ -185,12 +187,12 @@ const normalizeStatus = (
       );
 
       setPriority(
-  normalizePriority(task.priority)
-);
+        normalizePriority(task.priority)
+      );
 
       setStatus(
-  normalizeStatus(task.status)
-);
+        normalizeStatus(task.status)
+      );
 
       setDue(
         task.dueDate ??
@@ -414,25 +416,25 @@ const normalizeStatus = (
                 Priority
               </Label>
 
-             <Select
-  value={priority}
-  onValueChange={(value) => {
-    console.log("Selected priority:", value);
-    setPriority(value as TaskPriority);
-  }}
->
-  <SelectTrigger>
-    <SelectValue placeholder="Select priority" />
-  </SelectTrigger>
+              <Select
+                value={priority}
+                onValueChange={(value) => {
+                  console.log("Selected priority:", value);
+                  setPriority(value as TaskPriority);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
 
-  <SelectContent>
-    {Object.values(TaskPriority).map((item) => (
-      <SelectItem key={item} value={item}>
-        {item}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
+                <SelectContent>
+                  {Object.values(TaskPriority).map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
