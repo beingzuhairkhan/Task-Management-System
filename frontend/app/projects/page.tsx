@@ -133,26 +133,43 @@ export default function ProjectsPage() {
   }, [query, priorityFilter, statusFilter]);
 
   const rows = useMemo(() => {
-    const q = query.trim().toLowerCase();
+  const q = query.trim().toLowerCase();
 
-    return projects.filter(
-      (p) =>
-        (q
-          ? p.name?.toLowerCase().includes(q)
-          : true) &&
-        (priorityFilter === "All"
-          ? true
-          : p.priority === priorityFilter.toUpperCase()) &&
-        (statusFilter === "All"
-          ? true
-          : p.status === statusFilter.toUpperCase()),
+  const normalizedPriority =
+    priorityFilter === "All"
+      ? null
+      : priorityFilter.toUpperCase().replace(/\s+/g, "_");
+
+  const normalizedStatus =
+    statusFilter === "All"
+      ? null
+      : statusFilter.toUpperCase();
+
+  return projects.filter((p) => {
+    const matchesSearch = q
+      ? p.name?.toLowerCase().includes(q)
+      : true;
+
+    const matchesPriority = normalizedPriority
+      ? p.priority === normalizedPriority
+      : true;
+
+    const matchesStatus = normalizedStatus
+      ? p.status === normalizedStatus
+      : true;
+
+    return (
+      matchesSearch &&
+      matchesPriority &&
+      matchesStatus
     );
-  }, [
-    projects,
-    query,
-    priorityFilter,
-    statusFilter,
-  ]);
+  });
+}, [
+  projects,
+  query,
+  priorityFilter,
+  statusFilter,
+]);
 
   const filtersActive =
     priorityFilter !== "All" ||
