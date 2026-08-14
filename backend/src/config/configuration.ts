@@ -25,11 +25,12 @@ export const config = () => ({
 
   jwt: {
     secret:
-      process.env.JWT_SECRET ||
-      'fallback-dev-secret',
-
+      process.env.JWT_SECRET ,
     expiresIn:
-      process.env.JWT_EXPIRES_IN || '1d',
+      process.env.JWT_EXPIRES_IN,
+
+    refreshSecret:process.env.JWT_REFRESH_TOKEN,
+    refreshExpiresIn:process.env.JWT_REFRESH_EXPIRES_IN
   },
 
   google: {

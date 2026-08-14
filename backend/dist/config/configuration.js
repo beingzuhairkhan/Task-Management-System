@@ -13,9 +13,10 @@ const config = () => ({
             'mongodb://localhost:27017/task_management',
     },
     jwt: {
-        secret: process.env.JWT_SECRET ||
-            'fallback-dev-secret',
-        expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRES_IN,
+        refreshSecret: process.env.JWT_REFRESH_TOKEN,
+        refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN
     },
     google: {
         clientId: process.env.GOOGLE_CLIENT_ID || '',

@@ -5,4 +5,5 @@ export interface JwtPayload {
   role: string;
   jti:string;
   exp?:number;
+  type?: 'access' | 'refresh';
 }

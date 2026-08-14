@@ -11,6 +11,9 @@ export declare class AuthController {
     googleAuth(): void;
     googleAuthCallback(req: Request, res: Response): Promise<void>;
     me(req: Request): Promise<Express.User>;
+    refresh(refreshToken: string): Promise<{
+        accessToken: string;
+    }>;
     logout(user: any): Promise<{
         message: string;
     }>;

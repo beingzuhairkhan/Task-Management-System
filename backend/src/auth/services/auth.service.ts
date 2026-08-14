@@ -3,11 +3,13 @@ import {
   Injectable,
   OnModuleDestroy,
   OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 
 import { UserRepository } from '../../users/repositories/user.repository';
 import { User } from '../../users/schemas/user.schema';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService
@@ -16,6 +18,7 @@ export class AuthService
 
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly tokenService: TokenService,
   ) {
     this.redisClient = createClient({
       url: process.env.REDIS_URL,
@@ -73,13 +76,11 @@ export class AuthService
   }
 
   async logout(jti: string, exp: number) {
-
     if (!jti) {
       return {
         message: 'Invalid token: jti is missing',
       };
     }
-
     if (!exp) {
       return {
         message: 'Invalid token: exp is missing',
@@ -89,9 +90,7 @@ export class AuthService
     const now = Math.floor(Date.now() / 1000);
     const expiresIn = exp - now;
 
-
     if (expiresIn <= 0) {
-
       return {
         message: 'Token already expired',
       };
@@ -108,16 +107,13 @@ export class AuthService
       );
 
       await this.redisClient.get(key);
-
       await this.redisClient.ttl(key);
-
 
       return {
         message: 'Logged out successfully',
       };
     } catch (error) {
       console.error('REDIS ERROR:', error);
-
       throw error;
     }
   }
@@ -128,8 +124,54 @@ export class AuthService
     const exists = await this.redisClient.exists(
       `blacklist:${jti}`,
     );
-
     return exists === 1;
   }
+
+  async refreshAccessToken(refreshToken: string) {
+  try {
+    const payload =
+      this.tokenService.verifyRefreshToken(refreshToken);
+
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedException(
+        'Invalid refresh token',
+      );
+    }
+
+    const blacklisted =
+      await this.isTokenBlacklisted(payload.jti);
+
+    if (blacklisted) {
+      throw new UnauthorizedException(
+        'Refresh token has been revoked',
+      );
+    }
+
+    const user = await this.userRepository.findById(
+      payload.sub,
+    );
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'User no longer exists',
+      );
+    }
+
+    const accessToken =
+      this.tokenService.generateAccessToken(user);
+
+    return {
+      accessToken,
+    };
+  } catch (error) {
+    if (error instanceof UnauthorizedException) {
+      throw error;
+    }
+
+    throw new UnauthorizedException(
+      'Invalid or expired refresh token',
+    );
+  }
+}
 }
 

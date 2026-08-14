@@ -56,9 +56,7 @@ authAPI.interceptors.response.use(
       error.config as AxiosRequestConfigWithRetry;
 
     const isAuthRoute =
-      originalRequest?.url?.includes(
-        "/auth/refresh"
-      );
+      originalRequest?.url?.includes("/auth/refresh");
 
     if (
       error.response?.status === 401 &&
@@ -69,14 +67,10 @@ authAPI.interceptors.response.use(
 
       try {
         const refreshToken =
-          localStorage.getItem(
-            "refreshToken"
-          );
+          localStorage.getItem("refreshToken");
 
         if (!refreshToken) {
-          throw new Error(
-            "No refresh token"
-          );
+          throw new Error("No refresh token");
         }
 
         const res = await axios.post(
@@ -94,9 +88,6 @@ authAPI.interceptors.response.use(
           newAccessToken
         );
 
-        authAPI.defaults.headers.common.Authorization =
-          `Bearer ${newAccessToken}`;
-
         originalRequest.headers = {
           ...originalRequest.headers,
           Authorization:
@@ -105,22 +96,14 @@ authAPI.interceptors.response.use(
 
         return authAPI(originalRequest);
       } catch {
-        localStorage.removeItem(
-          "accessToken"
-        );
-
-        localStorage.removeItem(
-          "refreshToken"
-        );
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
 
         if (
           typeof window !== "undefined" &&
-          window.location.pathname !==
-          "/login"
+          window.location.pathname !== "/"
         ) {
-          window.location.replace(
-            "/login"
-          );
+          window.location.replace("/");
         }
       }
     }
@@ -282,6 +265,9 @@ export const projectAPI = {
 
 
 export const userAPI = {
+  getMe: (): Promise<AxiosResponse> => {
+    return authAPI.get("/users/me");
+  },
   findAllUsers: (
     params?: PaginationParams
   ): Promise<AxiosResponse> => {

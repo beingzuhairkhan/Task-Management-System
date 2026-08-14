@@ -26,12 +26,35 @@ let TokenService = class TokenService {
             username: user.username,
             role: user.role,
             jti: (0, crypto_1.randomUUID)(),
+            type: 'access',
         };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, {
+            secret: this.configService.get('jwt.secret'),
+            expiresIn: this.configService.get('jwt.expiresIn'),
+        });
     }
-    verifyToken(token) {
+    generateRefreshToken(user) {
+        const payload = {
+            sub: String(user._id),
+            email: user.email,
+            username: user.username,
+            role: user.role,
+            jti: (0, crypto_1.randomUUID)(),
+            type: 'refresh',
+        };
+        return this.jwtService.sign(payload, {
+            secret: this.configService.get('jwt.refreshSecret'),
+            expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+        });
+    }
+    verifyAccessToken(token) {
         return this.jwtService.verify(token, {
             secret: this.configService.get('jwt.secret'),
+        });
+    }
+    verifyRefreshToken(token) {
+        return this.jwtService.verify(token, {
+            secret: this.configService.get('jwt.refreshSecret'),
         });
     }
 };

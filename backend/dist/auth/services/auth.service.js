@@ -13,9 +13,11 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const redis_1 = require("redis");
 const user_repository_1 = require("../../users/repositories/user.repository");
+const token_service_1 = require("./token.service");
 let AuthService = class AuthService {
-    constructor(userRepository) {
+    constructor(userRepository, tokenService) {
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
         this.redisClient = (0, redis_1.createClient)({
             url: process.env.REDIS_URL,
         });
@@ -89,10 +91,37 @@ let AuthService = class AuthService {
         const exists = await this.redisClient.exists(`blacklist:${jti}`);
         return exists === 1;
     }
+    async refreshAccessToken(refreshToken) {
+        try {
+            const payload = this.tokenService.verifyRefreshToken(refreshToken);
+            if (payload.type !== 'refresh') {
+                throw new common_1.UnauthorizedException('Invalid refresh token');
+            }
+            const blacklisted = await this.isTokenBlacklisted(payload.jti);
+            if (blacklisted) {
+                throw new common_1.UnauthorizedException('Refresh token has been revoked');
+            }
+            const user = await this.userRepository.findById(payload.sub);
+            if (!user) {
+                throw new common_1.UnauthorizedException('User no longer exists');
+            }
+            const accessToken = this.tokenService.generateAccessToken(user);
+            return {
+                accessToken,
+            };
+        }
+        catch (error) {
+            if (error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
+            throw new common_1.UnauthorizedException('Invalid or expired refresh token');
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_repository_1.UserRepository])
+    __metadata("design:paramtypes", [user_repository_1.UserRepository,
+        token_service_1.TokenService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

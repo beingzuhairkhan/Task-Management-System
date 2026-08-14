@@ -19,13 +19,39 @@ export class TokenService {
       username: user.username,
       role: user.role,
       jti: randomUUID(),
+      type: 'access',
     };
-    return this.jwtService.sign(payload);
+     return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('jwt.secret'),
+      expiresIn: this.configService.get<string>('jwt.expiresIn'),
+    });
   }
 
-  verifyToken(token: string): JwtPayload {
+   generateRefreshToken(user: User): string {
+    const payload: JwtPayload = {
+      sub: String(user._id),
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      jti: randomUUID(),
+      type: 'refresh',
+    };
+
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('jwt.refreshSecret'),
+      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn'),
+    });
+  }
+
+    verifyAccessToken(token: string): JwtPayload {
     return this.jwtService.verify(token, {
       secret: this.configService.get<string>('jwt.secret'),
+    });
+  }
+
+  verifyRefreshToken(token: string): JwtPayload {
+    return this.jwtService.verify(token, {
+      secret: this.configService.get<string>('jwt.refreshSecret'),
     });
   }
 }

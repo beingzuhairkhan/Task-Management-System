@@ -26,9 +26,12 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
     async validate(payload) {
         const { jti } = payload;
         if (!jti) {
-            throw new common_1.UnauthorizedException("Invalid token");
+            throw new common_1.UnauthorizedException('Invalid token');
         }
-        const blacklisted = await this.authService.isTokenBlacklisted(payload.jti);
+        if (payload.type !== 'access') {
+            throw new common_1.UnauthorizedException('Invalid access token');
+        }
+        const blacklisted = await this.authService.isTokenBlacklisted(jti);
         if (blacklisted) {
             throw new common_1.UnauthorizedException('Token has been revoked');
         }

@@ -7,5 +7,7 @@ export declare class TokenService {
     private configService;
     constructor(jwtService: JwtService, configService: ConfigService);
     generateAccessToken(user: User): string;
-    verifyToken(token: string): JwtPayload;
+    generateRefreshToken(user: User): string;
+    verifyAccessToken(token: string): JwtPayload;
+    verifyRefreshToken(token: string): JwtPayload;
 }

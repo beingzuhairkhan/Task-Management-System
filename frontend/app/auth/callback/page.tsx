@@ -3,14 +3,16 @@
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const TOKEN_KEY = "accessToken";
+const ACCESS_TOKEN_KEY = "accessToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const accessToken = searchParams.get("accessToken");
+    const refreshToken = searchParams.get("refreshToken");
     const error = searchParams.get("error");
 
     if (error) {
@@ -20,14 +22,29 @@ function AuthCallbackContent() {
       return;
     }
 
-    if (!token) {
+    if (!accessToken) {
       console.error("No access token received");
 
-      router.replace("/login?error=no_token");
+      router.replace("/login?error=no_access_token");
       return;
     }
 
-    localStorage.setItem(TOKEN_KEY, token);
+    if (!refreshToken) {
+      console.error("No refresh token received");
+
+      router.replace("/login?error=no_refresh_token");
+      return;
+    }
+
+    localStorage.setItem(
+      ACCESS_TOKEN_KEY,
+      accessToken,
+    );
+
+    localStorage.setItem(
+      REFRESH_TOKEN_KEY,
+      refreshToken,
+    );
 
     router.replace("/");
   }, [router, searchParams]);

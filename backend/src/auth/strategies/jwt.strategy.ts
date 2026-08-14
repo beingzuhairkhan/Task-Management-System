@@ -9,38 +9,41 @@ import { AuthService } from './../services/auth.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private authService : AuthService
+    private authService: AuthService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET ,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
   async validate(payload: JwtPayload) {
-    const { jti } = payload;
+  const { jti } = payload;
 
-    if (!jti) {
-      throw new UnauthorizedException("Invalid token");
-    }
-
-    const blacklisted =
-  await this.authService.isTokenBlacklisted(payload.jti);
-
-
-if (blacklisted) {
-  throw new UnauthorizedException(
-    'Token has been revoked',
-  );
-}
-
-    return {
-      _id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-      jti: payload.jti,
-      exp: payload.exp, 
-    };
+  if (!jti) {
+    throw new UnauthorizedException('Invalid token');
   }
+
+  if (payload.type !== 'access') {
+    throw new UnauthorizedException('Invalid access token');
+  }
+
+  const blacklisted =
+    await this.authService.isTokenBlacklisted(jti);
+
+  if (blacklisted) {
+    throw new UnauthorizedException(
+      'Token has been revoked',
+    );
+  }
+
+  return {
+    _id: payload.sub,
+    email: payload.email,
+    role: payload.role,
+    jti: payload.jti,
+    exp: payload.exp,
+  };
+}
 }

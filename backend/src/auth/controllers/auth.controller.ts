@@ -6,7 +6,8 @@ import {
   Res,
   Logger,
   Query,
-  Post
+  Post,
+  Body
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -50,10 +51,17 @@ export class AuthController {
       return res.redirect(`${this.configService.get<string>('clientUrl')}/login?error=no_user`);
     }
 
-    const token = this.tokenService.generateAccessToken(user);
-    const redirectUrl = this.configService.get<string>('clientUrl');
+    const accessToken =
+      this.tokenService.generateAccessToken(user);
+
+    const refreshToken =
+      this.tokenService.generateRefreshToken(user);
+    const redirectUrl =
+      this.configService.get<string>('clientUrl');
     this.logger.log(`User ${user.email} authenticated via Google OAuth`);
-    res.redirect(`${redirectUrl}/auth/callback?token=${token}`);
+    res.redirect(
+      `${redirectUrl}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`,
+    );
   }
 
   @Get('me')
@@ -63,14 +71,19 @@ export class AuthController {
     return req.user;
   }
 
+  @Post('refresh')
+  @Public()
+  @ApiOperation({ summary: 'Refresh access token' })
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken);
+  }
+
   @Post('logout')
   async logout(@CurrentUser() user: any) {
-
     const result = await this.authService.logout(
       user?.jti,
       user?.exp,
     );
-
     return result;
   }
 }

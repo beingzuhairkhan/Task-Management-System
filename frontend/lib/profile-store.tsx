@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -10,19 +9,22 @@ import {
   type ReactNode,
 } from "react";
 
+import {  userAPI } from '@/services/api';
+
 export type Profile = {
   id: string;
   email: string;
   username: string;
   role: string;
   avatar: string;
-  jobTitle:string;
-  fullName:string;
+  jobTitle: string;
+  fullName: string;
   initials?: string;
 };
 
 const STORAGE_KEY = "dexter.profile.v1";
-const TOKEN_KEY = "accessToken";
+const ACCESS_TOKEN_KEY = "accessToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
 
 const defaultProfile: Profile = {
   id: "",
@@ -30,8 +32,8 @@ const defaultProfile: Profile = {
   username: "Dexuser",
   role: "USER",
   avatar: "",
-  jobTitle:"",
-  fullName:""
+  jobTitle: "",
+  fullName: "",
 };
 
 type ProfileContextValue = {
@@ -55,6 +57,7 @@ export const getAvatarOrInitials = (
   }
 
   const source = username.trim() || "User";
+
   return source.slice(0, 2).toUpperCase();
 };
 
@@ -74,7 +77,6 @@ export function ProfileProvider({
 
   const [isLoggedIn, setIsLoggedIn] =
     useState(false);
-
 
   useEffect(() => {
     try {
@@ -105,54 +107,27 @@ export function ProfileProvider({
     if (!hydrated) return;
 
     const loadUser = async () => {
-      const token =
-        window.localStorage.getItem(TOKEN_KEY);
+      const accessToken =
+        window.localStorage.getItem(
+          ACCESS_TOKEN_KEY
+        );
 
-      if (!token) {
+      const refreshToken =
+        window.localStorage.getItem(
+          REFRESH_TOKEN_KEY
+        );
+
+      if (!accessToken && !refreshToken) {
         setIsLoggedIn(false);
         setLoading(false);
         return;
       }
 
-    
       try {
-        const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "http://localhost:4000"
-          }/api/users/me`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response =
+          await userAPI.getMe();
 
-     
-        if (!response.ok) {
-          if (
-            response.status === 401 ||
-            response.status === 403
-          ) {
-            window.localStorage.removeItem(
-              TOKEN_KEY
-            );
-
-            window.localStorage.removeItem(
-              STORAGE_KEY
-            );
-
-            setIsLoggedIn(false);
-            setProfile(defaultProfile);
-          }
-
-          return;
-        }
-
-      
-        const user = await response.json();
+        const user = response.data;
 
         setIsLoggedIn(true);
 
@@ -161,10 +136,13 @@ export function ProfileProvider({
           email: user.email || "",
           username: user.username || "",
           role: user.role || "USER",
-          avatar: user.avatar ? user.avatar : getAvatarOrInitials(user.username || ""),
-          jobTitle:user.jobTitle || "" ,
-          fullName:user.fullName || "" ,
-         
+          avatar: user.avatar
+            ? user.avatar
+            : getAvatarOrInitials(
+                user.username || ""
+              ),
+          jobTitle: user.jobTitle || "",
+          fullName: user.fullName || "",
         });
       } catch (error) {
         console.error(
@@ -172,8 +150,7 @@ export function ProfileProvider({
           error
         );
 
-   
-        setIsLoggedIn(true);
+        setIsLoggedIn(false);
       } finally {
         setLoading(false);
       }
@@ -182,7 +159,7 @@ export function ProfileProvider({
     loadUser();
   }, [hydrated]);
 
-
+ 
   useEffect(() => {
     if (!hydrated) return;
 
@@ -199,10 +176,14 @@ export function ProfileProvider({
     }
   }, [profile, hydrated]);
 
-  
+
   const logout = () => {
     window.localStorage.removeItem(
-      TOKEN_KEY
+      ACCESS_TOKEN_KEY
+    );
+
+    window.localStorage.removeItem(
+      REFRESH_TOKEN_KEY
     );
 
     window.localStorage.removeItem(
@@ -213,7 +194,7 @@ export function ProfileProvider({
     setProfile(defaultProfile);
   };
 
- 
+
   const updateProfile = (
     patch: Partial<Profile>
   ) => {
@@ -223,9 +204,11 @@ export function ProfileProvider({
         ...patch,
       };
 
-      nextProfile.initials = getAvatarOrInitials(
-        nextProfile.username
-      );
+      nextProfile.initials =
+        getAvatarOrInitials(
+          nextProfile.username,
+          nextProfile.avatar
+        );
 
       return nextProfile;
     });
@@ -281,4 +264,3 @@ export function useProfile(): ProfileContextValue {
 
   return context;
 }
-

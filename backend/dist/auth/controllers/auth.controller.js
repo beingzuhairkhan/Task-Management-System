@@ -36,13 +36,17 @@ let AuthController = AuthController_1 = class AuthController {
         if (!user) {
             return res.redirect(`${this.configService.get('clientUrl')}/login?error=no_user`);
         }
-        const token = this.tokenService.generateAccessToken(user);
+        const accessToken = this.tokenService.generateAccessToken(user);
+        const refreshToken = this.tokenService.generateRefreshToken(user);
         const redirectUrl = this.configService.get('clientUrl');
         this.logger.log(`User ${user.email} authenticated via Google OAuth`);
-        res.redirect(`${redirectUrl}/auth/callback?token=${token}`);
+        res.redirect(`${redirectUrl}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`);
     }
     async me(req) {
         return req.user;
+    }
+    async refresh(refreshToken) {
+        return this.authService.refreshAccessToken(refreshToken);
     }
     async logout(user) {
         const result = await this.authService.logout(user?.jti, user?.exp);
@@ -80,6 +84,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "me", null);
+__decorate([
+    (0, common_1.Post)('refresh'),
+    (0, public_decorator_1.Public)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Refresh access token' }),
+    __param(0, (0, common_1.Body)('refreshToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refresh", null);
 __decorate([
     (0, common_1.Post)('logout'),
     __param(0, (0, common_2.CurrentUser)()),

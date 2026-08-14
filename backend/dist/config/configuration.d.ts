@@ -9,6 +9,8 @@ export declare const config: () => {
     jwt: {
         secret: string;
         expiresIn: string;
+        refreshSecret: string;
+        refreshExpiresIn: string;
     };
     google: {
         clientId: string;
