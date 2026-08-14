@@ -81,7 +81,7 @@ export default function ProjectsPage() {
           priority:
             priorityFilter === "All"
               ? undefined
-              : (priorityFilter.toUpperCase() as ProjectPriority),
+              : (priorityFilter.toUpperCase().replace(/\s+/g, "_") as ProjectPriority),
 
           status:
             statusFilter === "All"
@@ -89,7 +89,6 @@ export default function ProjectsPage() {
               : (statusFilter.toUpperCase() as ProjectStatus),
         });
 
-        console.log("Projects API response:", response.data);
 
         const apiProjects = response.data?.data ?? [];
 
