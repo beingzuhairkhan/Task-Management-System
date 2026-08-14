@@ -19,7 +19,8 @@ import {
 import { ProjectRole, ProjectStatus, ProjectPriority } from '../../common/enums';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../users/schemas/user.schema';
-
+import { Subtask, } from 'src/subtasks/schemas/subtask.schema';
+import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
@@ -28,6 +29,8 @@ export class ProjectsService {
     private readonly userRepository: UserRepository,
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+       @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
+    @InjectModel(Task.name) private taskModel: Model<Task>
   ) { }
 
   async create(dto: CreateProjectDto, userId: string) {
@@ -70,73 +73,206 @@ export class ProjectsService {
     }
   }
 
+  // async findAll(
+  //   dto: PaginationDto,
+  //   userId: string,
+  // ): Promise<PaginatedResult<any>> {
+  //   try {
+
+
+  //     const userObjectId = new Types.ObjectId(userId);
+
+  //     const baseFilter = {
+  //       $or: [
+  //         { owner: userObjectId },
+  //         { lead: userObjectId },
+  //       ],
+  //     };
+
+  //     const searchFilter = buildSearchFilter(
+  //       dto.search,
+  //       ['title', 'description'],
+  //     );
+
+  //     const filters: any[] = [baseFilter];
+
+  //     // Search
+  //     if (searchFilter.$or) {
+  //       filters.push(searchFilter);
+  //     }
+
+  //     // Priority
+  //     if (dto.priority) {
+  //       filters.push({
+  //         priority: dto.priority,
+  //       });
+  //     }
+
+  //     // Status
+  //     if (dto.status) {
+  //       filters.push({
+  //         status: dto.status,
+  //       });
+  //     }
+  //     const filter =
+  //       filters.length === 1
+  //         ? baseFilter
+  //         : { $and: filters };
+
+  //     const sort = buildSortOption(dto.sort);
+
+  //     const page = dto.page || 1;
+  //     const limit = dto.limit || 20;
+  //     const skip = (page - 1) * limit;
+
+  //     const [projects, total] = await Promise.all([
+  //       this.projectRepository.findAll(
+  //         filter,
+  //         sort,
+  //         skip,
+  //         limit,
+  //       ),
+  //       this.projectRepository.count(filter),
+  //     ]);
+
+  //     return paginateResult(projects, total, dto);
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
   async findAll(
-    dto: PaginationDto,
-    userId: string,
-  ): Promise<PaginatedResult<any>> {
-    try {
+  dto: PaginationDto,
+  userId: string,
+): Promise<PaginatedResult<any>> {
+  try {
+    const userObjectId = new Types.ObjectId(userId);
+
+    const taskProjectIds = await this.taskModel.distinct('projectId', {
+      $or: [
+        { ownerId: userObjectId },
+        { reporter: userObjectId },
+        { members: userObjectId },
+      ],
+    });
+
+    const subtaskProjectResult = await this.substaskModel.aggregate([
+      {
+        $match: {
+          subMembers: userObjectId,
+        },
+      },
+
+      {
+        $lookup: {
+          from: 'tasks',
+          localField: 'taskId',
+          foreignField: '_id',
+          as: 'task',
+        },
+      },
+
+      {
+        $unwind: '$task',
+      },
+
+      {
+        $group: {
+          _id: null,
+          projectIds: {
+            $addToSet: '$task.projectId',
+          },
+        },
+      },
+    ]);
+
+    const subtaskProjectIds =
+      subtaskProjectResult[0]?.projectIds || [];
 
 
-      const userObjectId = new Types.ObjectId(userId);
+    const accessibleProjectIds = [
+      ...taskProjectIds,
+      ...subtaskProjectIds,
+    ];
 
-      const baseFilter = {
-        $or: [
-          { owner: userObjectId },
-          { lead: userObjectId },
-        ],
-      };
+    const baseFilter = {
+      $or: [
+        // Project owner
+        {
+          owner: userObjectId,
+        },
 
-      const searchFilter = buildSearchFilter(
-        dto.search,
-        ['title', 'description'],
-      );
+        // Project lead
+        {
+          lead: userObjectId,
+        },
 
-      const filters: any[] = [baseFilter];
+        // Project member
+        {
+          'members.user': userObjectId,
+        },
 
-      // Search
-      if (searchFilter.$or) {
-        filters.push(searchFilter);
-      }
+        // User belongs to task/subtask
+        {
+          _id: {
+            $in: accessibleProjectIds,
+          },
+        },
+      ],
+    };
 
-      // Priority
-      if (dto.priority) {
-        filters.push({
-          priority: dto.priority,
-        });
-      }
+    const searchFilter = buildSearchFilter(
+      dto.search,
+      ['title', 'description'],
+    );
 
-      // Status
-      if (dto.status) {
-        filters.push({
-          status: dto.status,
-        });
-      }
-      const filter =
-        filters.length === 1
-          ? baseFilter
-          : { $and: filters };
+    const filters: any[] = [baseFilter];
 
-      const sort = buildSortOption(dto.sort);
-
-      const page = dto.page || 1;
-      const limit = dto.limit || 20;
-      const skip = (page - 1) * limit;
-
-      const [projects, total] = await Promise.all([
-        this.projectRepository.findAll(
-          filter,
-          sort,
-          skip,
-          limit,
-        ),
-        this.projectRepository.count(filter),
-      ]);
-
-      return paginateResult(projects, total, dto);
-    } catch (err) {
-      throw err;
+    if (searchFilter.$or) {
+      filters.push(searchFilter);
     }
+
+    if (dto.priority) {
+      filters.push({
+        priority: dto.priority,
+      });
+    }
+
+
+    if (dto.status) {
+      filters.push({
+        status: dto.status,
+      });
+    }
+
+    const filter =
+      filters.length === 1
+        ? baseFilter
+        : {
+            $and: filters,
+          };
+
+    const sort = buildSortOption(dto.sort);
+
+    const page = dto.page || 1;
+    const limit = dto.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [projects, total] = await Promise.all([
+      this.projectRepository.findAll(
+        filter,
+        sort,
+        skip,
+        limit,
+      ),
+
+      this.projectRepository.count(filter),
+    ]);
+
+    return paginateResult(projects, total, dto);
+  } catch (err) {
+    throw err;
   }
+}
 
   async findById(id: string) {
     const project = await this.projectRepository.findById(id);

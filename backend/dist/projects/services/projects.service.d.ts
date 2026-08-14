@@ -8,12 +8,16 @@ import { UpdateMemberRoleDto } from '../dto/update-member-role.dto';
 import { PaginationDto, PaginatedResult } from '../../common';
 import { ProjectRole } from '../../common/enums';
 import { User } from '../../users/schemas/user.schema';
+import { Subtask } from 'src/subtasks/schemas/subtask.schema';
+import { Task } from 'src/tasks/schemas/task.schema';
 export declare class ProjectsService {
     private readonly projectRepository;
     private readonly userRepository;
     private readonly userModel;
+    private substaskModel;
+    private taskModel;
     private readonly logger;
-    constructor(projectRepository: ProjectRepository, userRepository: UserRepository, userModel: Model<User>);
+    constructor(projectRepository: ProjectRepository, userRepository: UserRepository, userModel: Model<User>, substaskModel: Model<Subtask>, taskModel: Model<Task>);
     create(dto: CreateProjectDto, userId: string): Promise<import("../schemas/project.schema").Project>;
     findAll(dto: PaginationDto, userId: string): Promise<PaginatedResult<any>>;
     findById(id: string): Promise<import("../schemas/project.schema").Project>;

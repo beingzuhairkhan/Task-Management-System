@@ -22,11 +22,15 @@ const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
 const mongoose_2 = require("@nestjs/mongoose");
 const user_schema_1 = require("../../users/schemas/user.schema");
+const subtask_schema_1 = require("../../subtasks/schemas/subtask.schema");
+const task_schema_1 = require("../../tasks/schemas/task.schema");
 let ProjectsService = ProjectsService_1 = class ProjectsService {
-    constructor(projectRepository, userRepository, userModel) {
+    constructor(projectRepository, userRepository, userModel, substaskModel, taskModel) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.userModel = userModel;
+        this.substaskModel = substaskModel;
+        this.taskModel = taskModel;
         this.logger = new common_1.Logger(ProjectsService_1.name);
     }
     async create(dto, userId) {
@@ -63,10 +67,60 @@ let ProjectsService = ProjectsService_1 = class ProjectsService {
     async findAll(dto, userId) {
         try {
             const userObjectId = new mongoose_1.Types.ObjectId(userId);
+            const taskProjectIds = await this.taskModel.distinct('projectId', {
+                $or: [
+                    { ownerId: userObjectId },
+                    { reporter: userObjectId },
+                    { members: userObjectId },
+                ],
+            });
+            const subtaskProjectResult = await this.substaskModel.aggregate([
+                {
+                    $match: {
+                        subMembers: userObjectId,
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'tasks',
+                        localField: 'taskId',
+                        foreignField: '_id',
+                        as: 'task',
+                    },
+                },
+                {
+                    $unwind: '$task',
+                },
+                {
+                    $group: {
+                        _id: null,
+                        projectIds: {
+                            $addToSet: '$task.projectId',
+                        },
+                    },
+                },
+            ]);
+            const subtaskProjectIds = subtaskProjectResult[0]?.projectIds || [];
+            const accessibleProjectIds = [
+                ...taskProjectIds,
+                ...subtaskProjectIds,
+            ];
             const baseFilter = {
                 $or: [
-                    { owner: userObjectId },
-                    { lead: userObjectId },
+                    {
+                        owner: userObjectId,
+                    },
+                    {
+                        lead: userObjectId,
+                    },
+                    {
+                        'members.user': userObjectId,
+                    },
+                    {
+                        _id: {
+                            $in: accessibleProjectIds,
+                        },
+                    },
                 ],
             };
             const searchFilter = (0, common_2.buildSearchFilter)(dto.search, ['title', 'description']);
@@ -86,7 +140,9 @@ let ProjectsService = ProjectsService_1 = class ProjectsService {
             }
             const filter = filters.length === 1
                 ? baseFilter
-                : { $and: filters };
+                : {
+                    $and: filters,
+                };
             const sort = (0, common_2.buildSortOption)(dto.sort);
             const page = dto.page || 1;
             const limit = dto.limit || 20;
@@ -190,8 +246,12 @@ exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = ProjectsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(2, (0, mongoose_2.InjectModel)(user_schema_1.User.name)),
+    __param(3, (0, mongoose_2.InjectModel)(subtask_schema_1.Subtask.name)),
+    __param(4, (0, mongoose_2.InjectModel)(task_schema_1.Task.name)),
     __metadata("design:paramtypes", [project_repository_1.ProjectRepository,
         user_repository_1.UserRepository,
+        mongoose_1.Model,
+        mongoose_1.Model,
         mongoose_1.Model])
 ], ProjectsService);
 //# sourceMappingURL=projects.service.js.map
