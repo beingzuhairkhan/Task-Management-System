@@ -14,6 +14,11 @@ export declare class AuthController {
     refresh(refreshToken: string): Promise<{
         accessToken: string;
     }>;
+    getHealth(): {
+        status: string;
+        message: string;
+        timestamp: string;
+    };
     logout(user: any): Promise<{
         message: string;
     }>;

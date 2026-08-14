@@ -48,6 +48,13 @@ let AuthController = AuthController_1 = class AuthController {
     async refresh(refreshToken) {
         return this.authService.refreshAccessToken(refreshToken);
     }
+    getHealth() {
+        return {
+            status: 'ok',
+            message: 'Auth API is healthy',
+            timestamp: new Date().toISOString(),
+        };
+    }
     async logout(user) {
         const result = await this.authService.logout(user?.jti, user?.exp);
         return result;
@@ -93,6 +100,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refresh", null);
+__decorate([
+    (0, common_1.Get)('health'),
+    (0, public_decorator_1.Public)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getHealth", null);
 __decorate([
     (0, common_1.Post)('logout'),
     __param(0, (0, common_2.CurrentUser)()),

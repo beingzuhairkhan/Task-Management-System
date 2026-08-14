@@ -78,6 +78,17 @@ export class AuthController {
     return this.authService.refreshAccessToken(refreshToken);
   }
 
+@Get('health')
+@Public()
+getHealth() {
+  return {
+    status: 'ok',
+    message: 'Auth API is healthy',
+    timestamp: new Date().toISOString(),
+  };
+}
+
+
   @Post('logout')
   async logout(@CurrentUser() user: any) {
     const result = await this.authService.logout(
