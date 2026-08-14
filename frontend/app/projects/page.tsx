@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { ProjectsSkeleton } from "@/components/projects/ProjectsSkeleton"
 const columns = ["Priority", "Lead", "Status", "Due Date"] as const;
 
 type Column = (typeof columns)[number];
@@ -364,14 +365,7 @@ export default function ProjectsPage() {
 
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-10 text-center text-sm text-muted-foreground"
-                    >
-                      Loading projects...
-                    </td>
-                  </tr>
+                  <ProjectsSkeleton />
                 ) : (
 
                   <>
