@@ -18,7 +18,7 @@ import {
 
 import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
-import { TaskBoardSkeleton } from "./TaskListSkeleton";
+import { TaskListSkeleton } from "./TaskListSkeleton";
 
 type ListViewProps = {
   query: string;
@@ -55,7 +55,7 @@ export function ListView({
     ].filter(show).length;
 
   if (loading) {
-    return <TaskBoardSkeleton />;
+    return <TaskListSkeleton />;
   }
 
   return (

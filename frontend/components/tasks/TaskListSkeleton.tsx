@@ -98,7 +98,7 @@ function SkeletonSection({
   );
 }
 
-export function TaskBoardSkeleton() {
+export function TaskListSkeleton() {
   return (
     <div className="space-y-10">
       <SkeletonSection color="bg-slate-400" rows={2} />
