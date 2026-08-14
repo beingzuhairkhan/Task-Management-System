@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { taskAPI } from "@/services/api";
 import type { Task } from "@/lib/tasks-data";
 import { groups } from "@/lib/tasks-data";
+import { toast } from "sonner";
 type TasksContextValue = {
   tasks: Task[];
   loading: boolean;
@@ -93,22 +94,28 @@ export function TasksProvider({
     },
     [projectId, fetchTasks],
   );
-
-  const deleteTask = useCallback(
+const deleteTask = useCallback(
   async (taskId: string) => {
     if (!projectId) {
       throw new Error("Project ID is missing");
     }
 
-    await taskAPI.deleteTask(projectId, taskId);
+    try {
+      await taskAPI.deleteTask(projectId, taskId);
 
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.id !== taskId),
-    );
+      setTasks((currentTasks) =>
+        currentTasks.filter((task) => task.id !== taskId),
+      );
+
+      toast.success("Task deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+
+      toast.error("Failed to delete task");
+    }
   },
   [projectId],
 );
-
   // Move task
   const moveTask = useCallback(
     async (taskId: string, groupId: string) => {
