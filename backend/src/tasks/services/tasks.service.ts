@@ -306,14 +306,51 @@ export class TasksService {
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const task = await this.taskRepository.findById(id);
-    if (!task) throw new NotFoundException('Task', id);
+    try {
 
-    await this.activityService.log({
-      taskId: id,
-      userId,
-      action: ActivityAction.DELETED,
-    });
-    await this.taskRepository.delete(id);
+      const existing = await this.taskRepository.findById(id);
+
+      if (!existing) {
+        throw new NotFoundException('Task', id);
+      }
+
+
+      // Permission check
+      const isMember = existing.members.some(
+        (m) => String(m) === String(userId),
+      );
+
+      const isCreator = String(existing.ownerId) === String(userId);
+      const isReporter = String(existing.reporter) === String(userId);
+
+
+      if (!isMember && !isCreator && !isReporter) {
+
+        throw new ForbiddenException(
+          'Only members, the task creator, or the reporter can delete this task',
+        );
+      }
+
+      await this.activityService.log({
+        taskId: id,
+        userId,
+        action: ActivityAction.DELETED,
+      });
+
+      await this.taskRepository.delete(id);
+
+    } catch (error) {
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Failed to delete task',
+      );
+    }
   }
 }

@@ -221,7 +221,16 @@ let TaskRepository = class TaskRepository {
             .exec();
     }
     async delete(id) {
-        await this.taskModel.deleteOne({ _id: id }).exec();
+        await this.substaskModel
+            .deleteMany({
+            taskId: new mongoose_2.Types.ObjectId(id),
+        })
+            .exec();
+        await this.taskModel
+            .deleteOne({
+            _id: new mongoose_2.Types.ObjectId(id),
+        })
+            .exec();
     }
     async findManyByProject(projectId) {
         return this.taskModel.find({ projectId: new mongoose_2.Types.ObjectId(projectId) }).exec();

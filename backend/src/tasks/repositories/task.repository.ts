@@ -142,7 +142,7 @@ export class TaskRepository {
             createdAt: 1,
             updatedAt: 1,
             labels: 1,
-            resources:1,
+            resources: 1,
 
             reporter: {
               id: "$reporter._id",
@@ -265,8 +265,19 @@ export class TaskRepository {
       .exec();
   }
 
+
   async delete(id: string): Promise<void> {
-    await this.taskModel.deleteOne({ _id: id }).exec();
+    await this.substaskModel
+      .deleteMany({
+        taskId: new Types.ObjectId(id),
+      })
+      .exec();
+
+    await this.taskModel
+      .deleteOne({
+        _id: new Types.ObjectId(id),
+      })
+      .exec();
   }
 
   async findManyByProject(projectId: string): Promise<Task[]> {

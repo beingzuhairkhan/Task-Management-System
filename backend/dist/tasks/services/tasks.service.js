@@ -231,15 +231,33 @@ let TasksService = class TasksService {
         return task;
     }
     async remove(id, userId) {
-        const task = await this.taskRepository.findById(id);
-        if (!task)
-            throw new common_2.NotFoundException('Task', id);
-        await this.activityService.log({
-            taskId: id,
-            userId,
-            action: enums_1.ActivityAction.DELETED,
-        });
-        await this.taskRepository.delete(id);
+        try {
+            const existing = await this.taskRepository.findById(id);
+            if (!existing) {
+                throw new common_2.NotFoundException('Task', id);
+            }
+            const isMember = existing.members.some((m) => String(m) === String(userId));
+            const isCreator = String(existing.ownerId) === String(userId);
+            const isReporter = String(existing.reporter) === String(userId);
+            if (!isMember && !isCreator && !isReporter) {
+                throw new common_2.ForbiddenException('Only members, the task creator, or the reporter can delete this task');
+            }
+            await this.activityService.log({
+                taskId: id,
+                userId,
+                action: enums_1.ActivityAction.DELETED,
+            });
+            await this.taskRepository.delete(id);
+        }
+        catch (error) {
+            if (error instanceof common_2.NotFoundException) {
+                throw error;
+            }
+            if (error instanceof common_2.ForbiddenException) {
+                throw error;
+            }
+            throw new common_1.InternalServerErrorException('Failed to delete task');
+        }
     }
 };
 exports.TasksService = TasksService;
