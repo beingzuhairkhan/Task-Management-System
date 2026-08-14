@@ -38,8 +38,8 @@ let ProjectsController = class ProjectsController {
     update(id, dto) {
         return this.projectsService.update(id, dto);
     }
-    async remove(id) {
-        await this.projectsService.remove(id);
+    async remove(id, user) {
+        await this.projectsService.remove(id, user._id);
     }
     inviteMember(id, dto) {
         return this.projectsService.inviteMember(id, dto);
@@ -100,8 +100,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete a project (owner only)' }),
     (0, swagger_1.ApiResponse)({ status: 204, description: 'Project deleted' }),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ProjectsController.prototype, "remove", null);
 __decorate([

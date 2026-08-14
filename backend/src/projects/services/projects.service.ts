@@ -156,10 +156,39 @@ export class ProjectsService {
     return project;
   }
 
-  async remove(id: string): Promise<void> {
-    const project = await this.projectRepository.findById(id);
-    if (!project) throw new NotFoundException('Project', id);
-    await this.projectRepository.delete(id);
+  async remove(id: string, userId: string): Promise<void> {
+    try {
+      const project = await this.projectRepository.findById(id);
+
+      if (!project) {
+        throw new NotFoundException('Project', id);
+      }
+
+
+      const isOwner =
+        String(project.owner?._id ?? project.owner) === String(userId);
+
+      const isLead =
+        String(project.lead?._id ?? project.lead) === String(userId);
+
+      if (!isOwner && !isLead) {
+        throw new ForbiddenException(
+          'Only the project owner or lead can delete this project',
+        );
+      }
+
+      await this.projectRepository.delete(id);
+    } catch (error) {
+      console.error('Error deleting project:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Failed to delete project',
+      );
+    }
   }
 
   async inviteMember(projectId: string, dto: InviteMemberDto) {

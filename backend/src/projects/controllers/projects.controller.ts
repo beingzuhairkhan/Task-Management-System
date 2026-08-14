@@ -68,8 +68,8 @@ export class ProjectsController {
   @ProjectRoles(ProjectRole.OWNER)
   @ApiOperation({ summary: 'Delete a project (owner only)' })
   @ApiResponse({ status: 204, description: 'Project deleted' })
-  async remove(@Param('id') id: string) {
-    await this.projectsService.remove(id);
+  async remove(@Param('id') id: string , @CurrentUser() user: any) {
+    await this.projectsService.remove(id , user._id);
   }
 
   @Post(':id/members')

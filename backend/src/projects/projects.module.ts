@@ -6,9 +6,19 @@ import { ProjectsService } from './services/projects.service';
 import { ProjectsController } from './controllers/projects.controller';
 import { ProjectMiddleware } from './middleware/project.middleware';
 import { UsersModule } from 'src/users/users.module';
-
+import { Subtask , SubtaskSchema } from 'src/subtasks/schemas/subtask.schema';
+import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Project', schema: ProjectSchema }]),
+  imports: [MongooseModule.forFeature([{ name: 'Project', schema: ProjectSchema },
+      {
+    name: Task.name,
+    schema: TaskSchema,
+  },
+   {
+    name: Subtask.name,
+    schema: SubtaskSchema,
+  },
+  ]),
     UsersModule
   ],
   controllers: [ProjectsController],

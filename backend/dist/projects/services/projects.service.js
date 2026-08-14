@@ -119,11 +119,26 @@ let ProjectsService = ProjectsService_1 = class ProjectsService {
             throw new common_2.NotFoundException('Project', id);
         return project;
     }
-    async remove(id) {
-        const project = await this.projectRepository.findById(id);
-        if (!project)
-            throw new common_2.NotFoundException('Project', id);
-        await this.projectRepository.delete(id);
+    async remove(id, userId) {
+        try {
+            const project = await this.projectRepository.findById(id);
+            if (!project) {
+                throw new common_2.NotFoundException('Project', id);
+            }
+            const isOwner = String(project.owner?._id ?? project.owner) === String(userId);
+            const isLead = String(project.lead?._id ?? project.lead) === String(userId);
+            if (!isOwner && !isLead) {
+                throw new common_2.ForbiddenException('Only the project owner or lead can delete this project');
+            }
+            await this.projectRepository.delete(id);
+        }
+        catch (error) {
+            console.error('Error deleting project:', error);
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.InternalServerErrorException('Failed to delete project');
+        }
     }
     async inviteMember(projectId, dto) {
         const project = await this.projectRepository.findById(projectId);

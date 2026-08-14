@@ -11,7 +11,7 @@ export declare class ProjectsController {
     findAll(dto: PaginationDto, user: any): Promise<import("../../common").PaginatedResult<any>>;
     findOne(id: string): Promise<import("../schemas/project.schema").Project>;
     update(id: string, dto: UpdateProjectDto): Promise<any>;
-    remove(id: string): Promise<void>;
+    remove(id: string, user: any): Promise<void>;
     inviteMember(id: string, dto: InviteMemberDto): Promise<import("../schemas/project.schema").Project>;
     updateMemberRole(id: string, userId: string, dto: UpdateMemberRoleDto): Promise<import("../schemas/project.schema").Project>;
     removeMember(id: string, userId: string): Promise<import("../schemas/project.schema").Project>;

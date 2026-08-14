@@ -12,6 +12,7 @@ import {
 
 import { TaskPriority } from "@/lib/tasks-data";
 import type { Member } from "@/lib/tasks-data";
+import { projectAPI } from "@/services/api";
 
 
 export type Project = {
@@ -203,17 +204,13 @@ export function ProjectsProvider({
             },
 
 
-            deleteProject: (
-                id: string
-            ) => {
-                setProjects(
-                    (prev) =>
-                        prev.filter(
-                            (project) =>
-                                project.id !== id
-                        )
-                );
-            },
+            deleteProject: async (id: string) => {
+      await projectAPI.deleteProjectById(id);
+
+      setProjects((prev) =>
+        prev.filter((project) => project.id !== id)
+      );
+    },
         }),
         [projects]
     );

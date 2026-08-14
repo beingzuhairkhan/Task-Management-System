@@ -20,11 +20,11 @@ import {
   type ProjectDialogState,
 } from "@/components/projects/project-dialog";
 
-import { useProjects, ProjectStatus , projectStatuses } from "@/lib/projects-store";
+import { useProjects, ProjectStatus, projectStatuses } from "@/lib/projects-store";
 import { priorities, TaskPriority } from "@/lib/tasks-data";
 import { cn } from "@/lib/utils";
 import { projectAPI } from "@/services/api";
-import type {ProjectPriority} from "@/services/api";
+import type { ProjectPriority } from "@/services/api";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { toast } from "sonner";
 const columns = ["Priority", "Lead", "Status", "Due Date"] as const;
 
 type Column = (typeof columns)[number];
@@ -86,7 +86,7 @@ export default function ProjectsPage() {
           status:
             statusFilter === "All"
               ? undefined
-              :(statusFilter.toUpperCase() as ProjectStatus),
+              : (statusFilter.toUpperCase() as ProjectStatus),
         });
 
         console.log("Projects API response:", response.data);
@@ -154,12 +154,23 @@ export default function ProjectsPage() {
     priorityFilter !== "All" ||
     statusFilter !== "All";
 
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteProject(id);
+
+      toast.success("Project deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+
+      toast.error("Failed to delete project");
+    }
+  };
 
 
   return (
     <div className="flex min-h-screen">
       <AppSidebar open
-                active="projects"/>
+        active="projects" />
 
       <main className="flex-1">
         <div className="border-b border-border">
@@ -388,7 +399,7 @@ export default function ProjectsPage() {
                         {shown("Priority") && (
                           <td className="hidden px-4 py-2.5 sm:table-cell">
                             <PriorityTag
-                             priority={p.priority.replace(/_/g, " ")}
+                              priority={p.priority.replace(/_/g, " ")}
                             />
                           </td>
                         )}
@@ -444,7 +455,7 @@ export default function ProjectsPage() {
 
                               <DropdownMenuItem
                                 onSelect={() =>
-                                  deleteProject(p.id)
+                                  handleDelete(p.id)
                                 }
                                 className="text-destructive focus:text-destructive"
                               >

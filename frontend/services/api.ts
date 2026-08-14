@@ -269,7 +269,7 @@ export const projectAPI = {
     );
   },
 
-  remove: (
+  deleteProjectById: (
     id: string
   ): Promise<AxiosResponse<void>> => {
     return authAPI.delete(
@@ -277,54 +277,7 @@ export const projectAPI = {
     );
   },
 
-  /*
-   * Invite member
-   *
-   * POST /projects/:id/members
-   */
-  inviteMember: (
-    projectId: string,
-    data: InviteMemberDto
-  ): Promise<
-    AxiosResponse<ProjectMember>
-  > => {
-    return authAPI.post(
-      `/projects/${projectId}/members`,
-      data
-    );
-  },
 
-  /*
-   * Update member role
-   *
-   * PATCH /projects/:id/members/:userId
-   */
-  updateMemberRole: (
-    projectId: string,
-    userId: string,
-    data: UpdateMemberRoleDto
-  ): Promise<
-    AxiosResponse<ProjectMember>
-  > => {
-    return authAPI.patch(
-      `/projects/${projectId}/members/${userId}`,
-      data
-    );
-  },
-
-  /*
-   * Remove member
-   *
-   * DELETE /projects/:id/members/:userId
-   */
-  removeMember: (
-    projectId: string,
-    userId: string
-  ): Promise<AxiosResponse<void>> => {
-    return authAPI.delete(
-      `/projects/${projectId}/members/${userId}`
-    );
-  },
 };
 
 

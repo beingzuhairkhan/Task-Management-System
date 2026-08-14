@@ -17,9 +17,13 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const project_schema_1 = require("../schemas/project.schema");
+const subtask_schema_1 = require("../../subtasks/schemas/subtask.schema");
+const task_schema_1 = require("../../tasks/schemas/task.schema");
 let ProjectRepository = class ProjectRepository {
-    constructor(projectModel) {
+    constructor(projectModel, substaskModel, taskModel) {
         this.projectModel = projectModel;
+        this.substaskModel = substaskModel;
+        this.taskModel = taskModel;
     }
     async create(data) {
         const created = new this.projectModel(data);
@@ -152,7 +156,23 @@ let ProjectRepository = class ProjectRepository {
             .exec();
     }
     async delete(id) {
-        await this.projectModel.deleteOne({ _id: id }).exec();
+        const tasks = await this.taskModel
+            .find({ projectId: new mongoose_2.Types.ObjectId(id) })
+            .select('_id')
+            .lean()
+            .exec();
+        const taskIds = tasks.map((task) => task._id);
+        if (taskIds.length > 0) {
+            await this.substaskModel.deleteMany({
+                taskId: { $in: taskIds },
+            }).exec();
+        }
+        await this.taskModel.deleteMany({
+            projectId: new mongoose_2.Types.ObjectId(id),
+        }).exec();
+        await this.projectModel.deleteOne({
+            _id: new mongoose_2.Types.ObjectId(id),
+        }).exec();
     }
     async findByMember(userId) {
         return this.projectModel
@@ -169,6 +189,10 @@ exports.ProjectRepository = ProjectRepository;
 exports.ProjectRepository = ProjectRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(project_schema_1.Project.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(subtask_schema_1.Subtask.name)),
+    __param(2, (0, mongoose_1.InjectModel)(task_schema_1.Task.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model])
 ], ProjectRepository);
 //# sourceMappingURL=project.repository.js.map

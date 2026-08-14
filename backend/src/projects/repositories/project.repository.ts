@@ -4,10 +4,14 @@ import { Model, Types } from 'mongoose';
 import { Project } from '../schemas/project.schema';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
-
+import { Subtask, } from 'src/subtasks/schemas/subtask.schema';
+import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
 @Injectable()
 export class ProjectRepository {
-  constructor(@InjectModel(Project.name) private projectModel: Model<Project>) { }
+  constructor(@InjectModel(Project.name) private projectModel: Model<Project>,
+  @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
+@InjectModel(Task.name) private taskModel: Model<Task>
+) { }
 
   async create(data: Partial<Project>): Promise<Project> {
     const created = new this.projectModel(data);
@@ -201,9 +205,33 @@ export class ProjectRepository {
       .exec();
   }
 
-  async delete(id: string): Promise<void> {
-    await this.projectModel.deleteOne({ _id: id }).exec();
+ async delete(id: string): Promise<void> {
+  // Find all tasks belonging to this project
+  const tasks = await this.taskModel
+    .find({ projectId: new Types.ObjectId(id) })
+    .select('_id')
+    .lean()
+    .exec();
+
+  const taskIds = tasks.map((task) => task._id);
+
+  // Delete all subtasks belonging to those tasks
+  if (taskIds.length > 0) {
+    await this.substaskModel.deleteMany({
+      taskId: { $in: taskIds },
+    }).exec();
   }
+
+  // Delete all tasks belonging to the project
+  await this.taskModel.deleteMany({
+    projectId: new Types.ObjectId(id),
+  }).exec();
+
+  // Delete the project
+  await this.projectModel.deleteOne({
+    _id: new Types.ObjectId(id),
+  }).exec();
+}
 
   async findByMember(userId: string): Promise<Project[]> {
     return this.projectModel

@@ -1,9 +1,13 @@
 import { Model, Types } from 'mongoose';
 import { Project } from '../schemas/project.schema';
 import { UpdateProjectDto } from '../dto/update-project.dto';
+import { Subtask } from 'src/subtasks/schemas/subtask.schema';
+import { Task } from 'src/tasks/schemas/task.schema';
 export declare class ProjectRepository {
     private projectModel;
-    constructor(projectModel: Model<Project>);
+    private substaskModel;
+    private taskModel;
+    constructor(projectModel: Model<Project>, substaskModel: Model<Subtask>, taskModel: Model<Task>);
     create(data: Partial<Project>): Promise<Project>;
     findById(id: string | Types.ObjectId): Promise<Project | null>;
     findByIdLean(id: string | Types.ObjectId): Promise<any>;

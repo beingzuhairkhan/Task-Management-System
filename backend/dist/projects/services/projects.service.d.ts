@@ -19,7 +19,7 @@ export declare class ProjectsService {
     findById(id: string): Promise<import("../schemas/project.schema").Project>;
     findByIdAndLoad(id: string): Promise<any>;
     update(id: string, dto: UpdateProjectDto): Promise<any>;
-    remove(id: string): Promise<void>;
+    remove(id: string, userId: string): Promise<void>;
     inviteMember(projectId: string, dto: InviteMemberDto): Promise<import("../schemas/project.schema").Project>;
     updateMemberRole(projectId: string, userId: string, dto: UpdateMemberRoleDto): Promise<import("../schemas/project.schema").Project>;
     removeMember(projectId: string, userId: string): Promise<import("../schemas/project.schema").Project>;

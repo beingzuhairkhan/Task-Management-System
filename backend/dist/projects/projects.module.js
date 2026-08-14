@@ -15,12 +15,23 @@ const projects_service_1 = require("./services/projects.service");
 const projects_controller_1 = require("./controllers/projects.controller");
 const project_middleware_1 = require("./middleware/project.middleware");
 const users_module_1 = require("../users/users.module");
+const subtask_schema_1 = require("../subtasks/schemas/subtask.schema");
+const task_schema_1 = require("../tasks/schemas/task.schema");
 let ProjectsModule = class ProjectsModule {
 };
 exports.ProjectsModule = ProjectsModule;
 exports.ProjectsModule = ProjectsModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'Project', schema: project_schema_1.ProjectSchema }]),
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'Project', schema: project_schema_1.ProjectSchema },
+                {
+                    name: task_schema_1.Task.name,
+                    schema: task_schema_1.TaskSchema,
+                },
+                {
+                    name: subtask_schema_1.Subtask.name,
+                    schema: subtask_schema_1.SubtaskSchema,
+                },
+            ]),
             users_module_1.UsersModule
         ],
         controllers: [projects_controller_1.ProjectsController],
