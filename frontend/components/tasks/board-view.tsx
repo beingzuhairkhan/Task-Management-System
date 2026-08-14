@@ -26,6 +26,7 @@ import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
 import { useParams } from "next/navigation";
 import {normalizeStatus} from "./task-dialog"
+import { TasksBoardSkeleton } from "@/components/tasks/tasks-board-skeleton";
 type BoardViewProps = {
   query: string;
   onDialog: (state: TaskDialogState) => void;
@@ -49,13 +50,8 @@ export function BoardView({
     fields.includes(field);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-10 text-sm text-muted-foreground">
-        Loading tasks...
-      </div>
-    );
-  }
-
+  return <TasksBoardSkeleton />;
+}
   return (
     <div>
 

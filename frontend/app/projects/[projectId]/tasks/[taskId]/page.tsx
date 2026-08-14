@@ -54,6 +54,7 @@ import {
      TaskPriority,
 } from "@/lib/tasks-data";
 
+import {TaskDetailsSkeleton} from "@/components/tasks/TaskDetailsSkeleton"
 
 import { SubtasksSection } from "@/components/tasks/SubtasksSection";
 
@@ -808,14 +809,8 @@ export default function TaskDetailPage() {
 
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-background">
-                <p className="text-sm text-muted-foreground">
-                    Loading task...
-                </p>
-            </div>
-        );
-    }
+    return <TaskDetailsSkeleton />;
+}
 
     if (!task) {
         return (
