@@ -114,6 +114,10 @@ export default function ProjectsPage() {
               : "No due date"),
 
           lead: project.lead,
+          priority:
+            project.priority === "NO_PRIORITY"
+              ? "NO_PRIORITY"
+              : project.priority,
         }));
 
         setProjects(formattedProjects);
