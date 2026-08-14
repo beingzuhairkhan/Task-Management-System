@@ -90,9 +90,10 @@ const handleLogout = async () => {
 
     toast.success("Logged out successfully");
      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
 
     // Optional: redirect after logout
-    window.location.href = "/login";
+    window.location.href = "/";
   } catch (error) {
     console.error(error);
     toast.error("Failed to logout");
