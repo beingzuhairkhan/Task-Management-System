@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { groups,  TaskPriority } from "@/lib/tasks-data";
+import { groups, TaskPriority } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
 
 import {
@@ -18,6 +18,7 @@ import {
 
 import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
+import { TaskBoardSkeleton } from "./TaskListSkeleton";
 
 type ListViewProps = {
   query: string;
@@ -54,11 +55,7 @@ export function ListView({
     ].filter(show).length;
 
   if (loading) {
-    return (
-      <div className="p-6 text-center text-sm text-muted-foreground">
-        Loading tasks...
-      </div>
-    );
+    return <TaskBoardSkeleton />;
   }
 
   return (
@@ -66,7 +63,7 @@ export function ListView({
       {groups.map((group) => {
         const isOpen = !collapsed[group.id];
 
-  
+
         const normalizedGroupId = group.id
           .toUpperCase()
           .replace("-", "_");
@@ -83,8 +80,8 @@ export function ListView({
 
           const matchesQuery = q
             ? String(task.title ?? "")
-                .toLowerCase()
-                .includes(q)
+              .toLowerCase()
+              .includes(q)
             : true;
 
           const matchesPriority =
@@ -218,8 +215,8 @@ export function ListView({
                         {show("Status") && (
                           <td className="hidden px-4 py-2.5 md:table-cell">
                             <LabelChip status={task.status}>
-  {task.status}
-</LabelChip>
+                              {task.status}
+                            </LabelChip>
                           </td>
                         )}
 
@@ -236,13 +233,13 @@ export function ListView({
                                     <LabelChip
                                       key={
                                         typeof label ===
-                                        "string"
+                                          "string"
                                           ? label
                                           : label.id
                                       }
                                     >
                                       {typeof label ===
-                                      "string"
+                                        "string"
                                         ? label
                                         : label.name}
                                     </LabelChip>
@@ -251,12 +248,12 @@ export function ListView({
 
                               {(task.labels ?? [])
                                 .length > 2 && (
-                                <LabelChip>
-                                  +
-                                  {task.labels
-                                    .length - 2}
-                                </LabelChip>
-                              )}
+                                  <LabelChip>
+                                    +
+                                    {task.labels
+                                      .length - 2}
+                                  </LabelChip>
+                                )}
                             </div>
                           </td>
                         )}
@@ -279,15 +276,15 @@ export function ListView({
                           <td className="hidden px-4 py-2.5 text-muted-foreground md:table-cell">
                             {task.dueDate
                               ? new Date(
-                                  task.dueDate,
-                                ).toLocaleDateString(
-                                  "en-GB",
-                                  {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                  },
-                                )
+                                task.dueDate,
+                              ).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                },
+                              )
                               : "No due date"}
                           </td>
                         )}
