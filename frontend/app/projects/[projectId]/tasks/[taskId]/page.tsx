@@ -1354,10 +1354,10 @@ export default function TaskDetailPage() {
                                                 align="start"
                                                 className="w-40"
                                             >
-
+{/* 
                                                 <DropdownMenuLabel className="text-xs text-muted-foreground">
                                                     Priority
-                                                </DropdownMenuLabel>
+                                                </DropdownMenuLabel> */}
 
                                                 <DropdownMenuSeparator />
 
