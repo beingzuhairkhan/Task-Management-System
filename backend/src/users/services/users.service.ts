@@ -22,16 +22,22 @@ export class UsersService {
     private readonly configService: ConfigService,
   ) {
     this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('mail.host'),
-      port: 465,
-      secure: true,
-      family: 4,
+      host: this.configService.get<string>("mail.host"),
+      port: Number(this.configService.get<string>("mail.port")),
+      secure:
+        this.configService.get<string>("mail.secure") === "true",
 
       auth: {
-        user: this.configService.get<string>('mail.user'),
-        pass: this.configService.get<string>('mail.password'),
+        user: this.configService.get<string>("mail.user"),
+        pass: this.configService.get<string>("mail.password"),
       },
-    });
+
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+
+      family: 4,
+    } as any);
     this.transporter
       .verify()
       .then(() => {

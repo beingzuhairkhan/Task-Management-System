@@ -55,14 +55,17 @@ let UsersService = UsersService_1 = class UsersService {
         this.configService = configService;
         this.logger = new common_1.Logger(UsersService_1.name);
         this.transporter = nodemailer.createTransport({
-            host: this.configService.get('mail.host'),
-            port: 465,
-            secure: true,
-            family: 4,
+            host: this.configService.get("mail.host"),
+            port: Number(this.configService.get("mail.port")),
+            secure: this.configService.get("mail.secure") === "true",
             auth: {
-                user: this.configService.get('mail.user'),
-                pass: this.configService.get('mail.password'),
+                user: this.configService.get("mail.user"),
+                pass: this.configService.get("mail.password"),
             },
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
+            family: 4,
         });
         this.transporter
             .verify()
