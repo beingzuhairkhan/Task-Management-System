@@ -1,3 +1,4 @@
+import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import {
   ChevronDown,
   ChevronRight,
@@ -187,6 +188,7 @@ export function Updates({ activities }: UpdatesProps) {
         <span className="text-sm font-medium text-foreground">
           Updates
         </span>
+          <DropdownMenuSeparator />
       </button>
 
       {/* Activities */}

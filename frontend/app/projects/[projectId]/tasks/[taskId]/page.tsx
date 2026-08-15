@@ -1359,7 +1359,7 @@ export default function TaskDetailPage() {
                                                     Priority
                                                 </DropdownMenuLabel> */}
 
-                                                <DropdownMenuSeparator />
+                                                {/* <DropdownMenuSeparator /> */}
 
                                                 {priorities.map(
                                                     (priority) => (

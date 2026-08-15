@@ -32,7 +32,7 @@ import type {
 } from "@/lib/tasks-data";
 
 import {
-    priorities,TaskPriority
+    priorities, TaskPriority
 } from "@/lib/tasks-data";
 
 import { formatDate } from "@/lib/date-utils";
@@ -111,9 +111,9 @@ export function SubtasksSection({
                     .replace(/\s+/g, "_");
             }
 
-if (!taskId) {
-  return;
-}
+            if (!taskId) {
+                return;
+            }
 
             await subTaskAPI.updateSubTaskById(
                 taskId,
@@ -149,7 +149,7 @@ if (!taskId) {
     return (
         <section className="rounded-xl border border-border bg-card">
 
-           
+
 
             <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
 
@@ -168,7 +168,7 @@ if (!taskId) {
             </div>
 
 
-    
+
 
             <div className="overflow-x-auto">
 
@@ -239,7 +239,7 @@ if (!taskId) {
                                     className="border-b border-border last:border-0 hover:bg-surface"
                                 >
 
-                                  
+
 
                                     <td className="px-3 py-2">
 
@@ -250,7 +250,7 @@ if (!taskId) {
                                     </td>
 
 
-                                  
+
 
                                     <td className="hidden px-3 py-2 sm:table-cell">
 
@@ -328,8 +328,8 @@ if (!taskId) {
 
                                                                 {subtask.status ===
                                                                     normalizedStatus && (
-                                                                    <Check className="size-4 text-primary" />
-                                                                )}
+                                                                        <Check className="size-4 text-primary" />
+                                                                    )}
 
                                                             </DropdownMenuItem>
                                                         );
@@ -343,7 +343,7 @@ if (!taskId) {
                                     </td>
 
 
-                                   
+
 
                                     <td className="hidden px-3 py-2 sm:table-cell">
 
@@ -374,7 +374,7 @@ if (!taskId) {
                                                 align="start"
                                             >
 
-                                                <DropdownMenuSeparator />
+                                                {/* <DropdownMenuSeparator /> */}
 
 
                                                 {priorities.map(
@@ -423,8 +423,8 @@ if (!taskId) {
 
                                                                 {subtask.priority ===
                                                                     normalizedPriority && (
-                                                                    <Check className="size-4 text-primary" />
-                                                                )}
+                                                                        <Check className="size-4 text-primary" />
+                                                                    )}
 
                                                             </DropdownMenuItem>
                                                         );
@@ -460,7 +460,7 @@ if (!taskId) {
                                     </td>
 
 
-                                 
+
 
                                     <td className="hidden px-3 py-2 text-muted-foreground md:table-cell">
 
@@ -480,10 +480,10 @@ if (!taskId) {
                                             type="button"
                                             aria-label={`Delete ${subtask.title}`}
                                             onClick={() =>
-  onDeleteSubtask?.(
-    subtask.id,
-  )
-}
+                                                onDeleteSubtask?.(
+                                                    subtask.id,
+                                                )
+                                            }
                                             disabled={isUpdating}
                                             className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
                                         >
@@ -499,7 +499,7 @@ if (!taskId) {
                         })}
 
 
-                
+
 
                         <tr>
 
