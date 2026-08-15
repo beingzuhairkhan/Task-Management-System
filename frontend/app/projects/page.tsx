@@ -79,67 +79,65 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
   return () => clearTimeout(timer);
 }, [query]);
 
-  // Fetch projects from API
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+
+      const response = await projectAPI.findAllProject({
+        search: debouncedQuery.trim() || undefined,
+
+        priority:
+          priorityFilter === "All"
+            ? undefined
+            : (priorityFilter
+                .toUpperCase()
+                .replace(/\s+/g, "_") as ProjectPriority),
+
+        status:
+          statusFilter === "All"
+            ? undefined
+            : (statusFilter.toUpperCase() as ProjectStatus),
+      });
+
+      const apiProjects = response.data?.data ?? [];
+
+      const formattedProjects = apiProjects.map((project: any) => ({
+        ...project,
+
+        id: project.id ?? project._id,
+
+        name: project.name ?? project.title,
+
+        due:
+          project.due ??
+          (project.dueDate
+            ? new Date(project.dueDate).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "No due date"),
+
+        lead: project.lead,
+
+        priority:
+          project.priority === "NO_PRIORITY"
+            ? "NO_PRIORITY"
+            : project.priority,
+      }));
+
+      setProjects(formattedProjects);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-
-        const response = await projectAPI.findAllProject({
-          search: debouncedQuery.trim() || undefined,
-
-          priority:
-            priorityFilter === "All"
-              ? undefined
-              : (priorityFilter.toUpperCase().replace(/\s+/g, "_") as ProjectPriority),
-
-          status:
-            statusFilter === "All"
-              ? undefined
-              : (statusFilter.toUpperCase() as ProjectStatus),
-        });
-
-
-        const apiProjects = response.data?.data ?? [];
-
-        const formattedProjects = apiProjects.map((project: any) => ({
-          ...project,
-
-          id: project.id ?? project._id,
-
-          name: project.name ?? project.title,
-
-          due:
-            project.due ??
-            (project.dueDate
-              ? new Date(project.dueDate).toLocaleDateString(
-                "en-GB",
-                {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                },
-              )
-              : "No due date"),
-
-          lead: project.lead,
-          priority:
-            project.priority === "NO_PRIORITY"
-              ? "NO_PRIORITY"
-              : project.priority,
-        }));
-
-        setProjects(formattedProjects);
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-        setProjects([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProjects();
-}, [debouncedQuery, priorityFilter, statusFilter]);
+  }, [debouncedQuery, priorityFilter, statusFilter]);
 
   const rows = useMemo(() => {
   const q = query.trim().toLowerCase();
