@@ -7,7 +7,7 @@ import { ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { groups } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
-
+import {normalizePriority} from './board-view'
 import {
   GroupDot,
   LabelChip,
@@ -185,10 +185,8 @@ export function ListView({
                         {show("Priority") && (
                           <td className="hidden px-4 py-2.5 sm:table-cell">
                             <PriorityTag
-                              priority={String(
-                                task.priority ?? "",
-                              ).replace(/_/g, " ")}
-                            />
+  priority={normalizePriority(task.priority)}
+/>
                           </td>
                         )}
 

@@ -22,10 +22,38 @@ import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
 import { normalizeStatus } from "./task-dialog";
 import { TasksBoardSkeleton } from "@/components/tasks/tasks-board-skeleton";
-
+import {TaskPriority} from "@/lib/tasks-data"
 type BoardViewProps = {
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
+};
+
+ export const normalizePriority = (
+  priority: unknown,
+): TaskPriority => {
+  const value = String(priority ?? "")
+    .toUpperCase()
+    .replace(/\s+/g, "_");
+
+  switch (value) {
+    case "LOW":
+      return TaskPriority.LOW;
+
+    case "MEDIUM":
+      return TaskPriority.MEDIUM;
+
+    case "HIGH":
+      return TaskPriority.HIGH;
+
+    case "URGENT":
+      return TaskPriority.URGENT;
+
+    case "NO_PRIORITY":
+      return TaskPriority.NO_PRIORITY;
+
+    default:
+      return TaskPriority.NO_PRIORITY;
+  }
 };
 
 export function BoardView({
@@ -42,18 +70,15 @@ export function BoardView({
 
   const projectId = params.projectId;
 
-  /*
-   * Check whether a field should be displayed.
-   */
   const show = (field: string) =>
     fields.includes(field);
 
-  /*
-   * Loading state
-   */
+ 
   if (loading) {
     return <TasksBoardSkeleton />;
   }
+
+ 
 
   return (
     <div>
@@ -270,14 +295,8 @@ export function BoardView({
                             "Priority",
                           ) && (
                             <PriorityTag
-                              priority={String(
-                                task.priority ??
-                                  "",
-                              ).replace(
-                                /_/g,
-                                " ",
-                              )}
-                            />
+  priority={normalizePriority(task.priority)}
+/>
                           )}
 
                           {/* Status */}
