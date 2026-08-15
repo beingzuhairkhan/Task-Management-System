@@ -67,14 +67,6 @@ let UsersService = UsersService_1 = class UsersService {
             socketTimeout: 60000,
             family: 4,
         });
-        this.transporter
-            .verify()
-            .then(() => {
-            this.logger.log('Gmail SMTP connection successful');
-        })
-            .catch((error) => {
-            this.logger.error(' Gmail SMTP connection failed', error.message);
-        });
     }
     async findAll(dto) {
         const filter = (0, common_2.buildSearchFilter)(dto.search, ['username', 'email', 'jobTitle']);

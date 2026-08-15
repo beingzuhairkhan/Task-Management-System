@@ -38,14 +38,6 @@ export class UsersService {
 
       family: 4,
     } as any);
-    this.transporter
-      .verify()
-      .then(() => {
-        this.logger.log('Gmail SMTP connection successful');
-      })
-      .catch((error) => {
-        this.logger.error(' Gmail SMTP connection failed', error.message);
-      });
   }
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {
