@@ -50,7 +50,8 @@ export declare enum ActivityAction {
     PRIORITY_CHANGED = "PRIORITY_CHANGED",
     MOVED = "MOVED",
     COMMENTED = "COMMENTED",
-    COMMENT_DELETED = "COMMENT_DELETED"
+    COMMENT_DELETED = "COMMENT_DELETED",
+    DUE_DATE_CHANGED = ""
 }
 export declare enum Group {
     TODO = "TODO",

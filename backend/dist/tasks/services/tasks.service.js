@@ -21,11 +21,13 @@ const activity_service_1 = require("../../activity/services/activity.service");
 const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
 const project_schema_1 = require("../../projects/schemas/project.schema");
+const subtask_schema_1 = require("../../subtasks/schemas/subtask.schema");
 let TasksService = class TasksService {
-    constructor(taskRepository, activityService, projectModel) {
+    constructor(taskRepository, activityService, projectModel, subTaskModel) {
         this.taskRepository = taskRepository;
         this.activityService = activityService;
         this.projectModel = projectModel;
+        this.subTaskModel = subTaskModel;
     }
     async create(dto, projectId, userId) {
         try {
@@ -69,7 +71,20 @@ let TasksService = class TasksService {
         if (!project) {
             throw new common_2.NotFoundException('Project not found');
         }
-        const filter = this.taskRepository.buildFilter(projectId, filterDto, dto.search, userId, project.owner, project.lead);
+        const userObjectId = new mongoose_1.Types.ObjectId(userId);
+        const isProjectOwner = project.owner?.equals(userObjectId);
+        const isProjectLead = project.lead?.equals(userObjectId);
+        let subTaskTaskIds = [];
+        if (!isProjectOwner && !isProjectLead) {
+            const subTasks = await this.subTaskModel
+                .find({
+                subMembers: userObjectId,
+            })
+                .select('taskId')
+                .lean();
+            subTaskTaskIds = subTasks.map((subTask) => subTask.taskId);
+        }
+        const filter = this.taskRepository.buildFilter(projectId, filterDto, dto.search, userId, project.owner, project.lead, subTaskTaskIds);
         const sort = (0, common_2.buildSortOption)(dto.sort);
         const page = dto.page || 1;
         const limit = dto.limit || 20;
@@ -145,6 +160,16 @@ let TasksService = class TasksService {
                     newValue: dto.priority,
                 });
             }
+            if (dto.dueDate !== undefined &&
+                dto.dueDate !== existing.dueDate) {
+                await this.activityService.log({
+                    taskId: id,
+                    userId,
+                    action: enums_1.ActivityAction.DUE_DATE_CHANGED,
+                    oldValue: existing.dueDate,
+                    newValue: dto.dueDate,
+                });
+            }
             if (dto.group !== undefined && dto.group !== existing.group) {
                 await this.activityService.log({
                     taskId: id,
@@ -183,6 +208,11 @@ let TasksService = class TasksService {
             }
             if (dto.resources !== undefined) {
                 updateData.resources = dto.resources;
+            }
+            if (dto.dueDate !== undefined) {
+                updateData.dueDate = dto.dueDate
+                    ? new Date(dto.dueDate)
+                    : undefined;
             }
             const task = await this.taskRepository.update(id, updateData);
             await this.activityService.log({
@@ -285,8 +315,10 @@ exports.TasksService = TasksService;
 exports.TasksService = TasksService = __decorate([
     (0, common_1.Injectable)(),
     __param(2, (0, mongoose_2.InjectModel)(project_schema_1.Project.name)),
+    __param(3, (0, mongoose_2.InjectModel)(subtask_schema_1.Subtask.name)),
     __metadata("design:paramtypes", [task_repository_1.TaskRepository,
         activity_service_1.ActivityService,
+        mongoose_1.Model,
         mongoose_1.Model])
 ], TasksService);
 //# sourceMappingURL=tasks.service.js.map

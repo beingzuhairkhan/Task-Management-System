@@ -62,6 +62,7 @@ var ActivityAction;
     ActivityAction["MOVED"] = "MOVED";
     ActivityAction["COMMENTED"] = "COMMENTED";
     ActivityAction["COMMENT_DELETED"] = "COMMENT_DELETED";
+    ActivityAction["DUE_DATE_CHANGED"] = "";
 })(ActivityAction || (exports.ActivityAction = ActivityAction = {}));
 var Group;
 (function (Group) {

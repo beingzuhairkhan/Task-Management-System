@@ -416,6 +416,15 @@ export default function TaskDetailPage() {
                 priority: task.priority.toUpperCase().replace(/\s+/g, "_"),
             };
         }
+        else if (
+    task.dueDate !== previousTask.dueDate
+) {
+    payload = {
+        dueDate: task.dueDate
+            ? new Date(task.dueDate).toISOString()
+            : null,
+    };
+}
 
         else {
             const currentMemberIds =
@@ -509,11 +518,7 @@ export default function TaskDetailPage() {
             try {
                 updatingRef.current = true;
 
-                console.log(
-                    "Updating task:",
-                    payload,
-                );
-
+      
                 await taskAPI.updateTaskById(
                     projectId,
                     taskId,

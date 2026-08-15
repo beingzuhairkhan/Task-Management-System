@@ -8,11 +8,13 @@ import { ActivityService } from '../../activity/services/activity.service';
 import { PaginationDto, PaginatedResult } from '../../common';
 import { Task } from '../schemas/task.schema';
 import { Project } from 'src/projects/schemas/project.schema';
+import { Subtask } from 'src/subtasks/schemas/subtask.schema';
 export declare class TasksService {
     private readonly taskRepository;
     private readonly activityService;
     private projectModel;
-    constructor(taskRepository: TaskRepository, activityService: ActivityService, projectModel: Model<Project>);
+    private subTaskModel;
+    constructor(taskRepository: TaskRepository, activityService: ActivityService, projectModel: Model<Project>, subTaskModel: Model<Subtask>);
     create(dto: CreateTaskDto, projectId: string, userId: string): Promise<Task>;
     findAll(projectId: string, filterDto: FilterTaskDto, dto: PaginationDto, userId: string): Promise<PaginatedResult<any>>;
     findById(id: string): Promise<any>;

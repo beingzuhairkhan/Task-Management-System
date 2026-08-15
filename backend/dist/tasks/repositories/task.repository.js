@@ -240,7 +240,7 @@ let TaskRepository = class TaskRepository {
     async findManyByProject(projectId) {
         return this.taskModel.find({ projectId: new mongoose_2.Types.ObjectId(projectId) }).exec();
     }
-    buildFilter(projectId, filterDto, search, userId, projectOwnerId, projectLeadId) {
+    buildFilter(projectId, filterDto, search, userId, projectOwnerId, projectLeadId, subTaskTaskIds = []) {
         const filter = {
             projectId: new mongoose_2.Types.ObjectId(projectId),
         };
@@ -252,9 +252,24 @@ let TaskRepository = class TaskRepository {
                 projectLeadId.equals(userObjectId);
             if (!isProjectOwner && !isProjectLead) {
                 filter.$or = [
-                    { reporter: userObjectId },
-                    { lead: userObjectId },
-                    { members: userObjectId },
+                    {
+                        reporter: userObjectId,
+                    },
+                    {
+                        lead: userObjectId,
+                    },
+                    {
+                        members: userObjectId,
+                    },
+                    ...(subTaskTaskIds.length > 0
+                        ? [
+                            {
+                                _id: {
+                                    $in: subTaskTaskIds,
+                                },
+                            },
+                        ]
+                        : []),
                 ];
             }
         }
@@ -277,20 +292,24 @@ let TaskRepository = class TaskRepository {
             delete filter.$or;
             filter.$and = [
                 ...(accessFilter
-                    ? [{ $or: accessFilter }]
+                    ? [
+                        {
+                            $or: accessFilter,
+                        },
+                    ]
                     : []),
                 {
                     $or: [
                         {
                             title: {
                                 $regex: search,
-                                $options: 'i',
+                                $options: "i",
                             },
                         },
                         {
                             description: {
                                 $regex: search,
-                                $options: 'i',
+                                $options: "i",
                             },
                         },
                     ],

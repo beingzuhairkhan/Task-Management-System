@@ -25,7 +25,7 @@ export class TasksService {
     private readonly taskRepository: TaskRepository,
     private readonly activityService: ActivityService,
     @InjectModel(Project.name) private projectModel: Model<Project>,
-     @InjectModel(Subtask.name) private subTaskModel: Model<Subtask>,
+    @InjectModel(Subtask.name) private subTaskModel: Model<Subtask>,
   ) { }
 
   async create(dto: CreateTaskDto, projectId: string, userId: string) {
@@ -110,6 +110,7 @@ export class TasksService {
       userId,
       project.owner,
       project.lead,
+      subTaskTaskIds,
     );
 
     const sort = buildSortOption(dto.sort);
@@ -215,6 +216,19 @@ export class TasksService {
         });
       }
 
+      if (
+  dto.dueDate !== undefined &&
+  dto.dueDate !== existing.dueDate
+) {
+  await this.activityService.log({
+    taskId: id,
+    userId,
+    action: ActivityAction.DUE_DATE_CHANGED,
+    oldValue: existing.dueDate,
+    newValue: dto.dueDate,
+  });
+}
+
       // Log group movement
       if (dto.group !== undefined && dto.group !== existing.group) {
         await this.activityService.log({
@@ -268,6 +282,12 @@ export class TasksService {
 
       if (dto.resources !== undefined) {
         updateData.resources = dto.resources;
+      }
+
+      if (dto.dueDate !== undefined) {
+        updateData.dueDate = dto.dueDate
+          ? new Date(dto.dueDate)
+          : undefined;
       }
 
       const task = await this.taskRepository.update(id, updateData);
