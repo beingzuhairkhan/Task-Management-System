@@ -102,11 +102,11 @@ export function TasksProvider({
     try {
       setLoading(true);
 
-      const params: {
-        search?: string;
-        priority?: string;
-        status?: string;
-      } = {};
+       const params: {
+      search?: string;
+      priority?: TaskPriority;
+      status?: TaskStatus;
+    } = {};
 
       // Search
       if (debouncedSearch.trim()) {

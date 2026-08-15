@@ -14,9 +14,6 @@ interface AxiosRequestConfigWithRetry
   _retry?: boolean;
 }
 
-/* =========================
-   AUTH API
-========================= */
 
 export const authAPI = axios.create({
   baseURL: API_BASE_URL,
@@ -26,9 +23,7 @@ export const authAPI = axios.create({
   },
 });
 
-/*
- * Attach access token to every request.
- */
+
 authAPI.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token =
@@ -46,9 +41,6 @@ authAPI.interceptors.request.use((config) => {
   return config;
 });
 
-/*
- * Refresh access token on 401.
- */
 authAPI.interceptors.response.use(
   (response) => response,
 
