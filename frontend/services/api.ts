@@ -1,6 +1,6 @@
 
 import { ProjectStatus } from "@/lib/projects-store";
-import { TaskStatus } from "@/lib/tasks-data";
+import { TaskStatus , TaskPriority} from "@/lib/tasks-data";
 import axios from "axios";
 import type {
   AxiosRequestConfig,

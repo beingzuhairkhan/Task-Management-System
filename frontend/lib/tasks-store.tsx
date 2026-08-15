@@ -114,17 +114,18 @@ export function TasksProvider({
       }
 
       // Priority
-      if (priorityFilter !== "All") {
-        params.priority = priorityFilter
-          .toUpperCase()
-          .replace(/\s+/g, "_");
-      }
+     if (priorityFilter !== "All") {
+      params.priority = priorityFilter
+        .toUpperCase()
+        .replace(/\s+/g, "_") as TaskPriority;
+    }
 
-      // Status
-      if (statusFilter !== "All") {
-        params.status = statusFilter
-          .toUpperCase()
-          .replace(/\s+/g, "_");
+    // Status
+    if (statusFilter !== "All") {
+      params.status = statusFilter
+        .toUpperCase()
+        .replace(/\s+/g, "_") as TaskStatus;
+    }
       }
 
       console.log("Fetching tasks with params:", params);
