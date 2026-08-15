@@ -48,6 +48,7 @@ export default function ProjectsPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [query, setQuery] = useState("");
+const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
 
   const [visible, setVisible] = useState<Column[]>([...columns]);
@@ -70,6 +71,14 @@ export default function ProjectsPage() {
         : [...prev, c],
     );
 
+    useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedQuery(query);
+  }, 500);
+
+  return () => clearTimeout(timer);
+}, [query]);
+
   // Fetch projects from API
   useEffect(() => {
     const fetchProjects = async () => {
@@ -77,7 +86,7 @@ export default function ProjectsPage() {
         setLoading(true);
 
         const response = await projectAPI.findAllProject({
-          search: query.trim() || undefined,
+          search: debouncedQuery.trim() || undefined,
 
           priority:
             priorityFilter === "All"
@@ -130,7 +139,7 @@ export default function ProjectsPage() {
     };
 
     fetchProjects();
-  }, [query, priorityFilter, statusFilter]);
+}, [debouncedQuery, priorityFilter, statusFilter]);
 
   const rows = useMemo(() => {
   const q = query.trim().toLowerCase();

@@ -85,32 +85,12 @@ export function BoardView({
       {/* Board */}
       <div className="grid min-w-0 grid-cols-1 gap-3 p-6 md:grid-cols-2 xl:grid-cols-4">
         {groups.map((group) => {
-          /*
-           * Normalize group IDs because your backend
-           * may return values such as:
-           *
-           * TODO
-           * IN_PROGRESS
-           *
-           * while frontend groups may use:
-           *
-           * todo
-           * in-progress
-           */
+        
           const normalizedGroupId = group.id
             .toUpperCase()
             .replace("-", "_");
 
-          /*
-           * IMPORTANT:
-           *
-           * Search, priority and status are NOT filtered here.
-           *
-           * They are already filtered on the server.
-           *
-           * The only filtering we do here is grouping
-           * tasks into the correct board column.
-           */
+         
           const tasks = allTasks.filter(
             (task: any) => {
               const taskGroup = String(

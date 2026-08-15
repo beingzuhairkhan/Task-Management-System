@@ -57,11 +57,6 @@ export function ListView({
       {groups.map((group) => {
         const isOpen = !collapsed[group.id];
 
-        /*
-         * Filtering is handled by TasksProvider/server API.
-         * Here we only filter by group so tasks appear
-         * under the correct board/list section.
-         */
         const normalizedGroupId = String(group.id)
           .toUpperCase()
           .replace(/-/g, "_");
