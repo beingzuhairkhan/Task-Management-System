@@ -18,7 +18,7 @@ async function bootstrap() {
     }));
     app.useGlobalFilters(new global_exception_filter_1.GlobalExceptionFilter());
     app.enableCors({
-        origin: configService.get('clientUrl') || '*',
+        origin: configService.get('clientUrl') || 'http://localhost:3000',
         credentials: true,
     });
     const config = new swagger_1.DocumentBuilder()

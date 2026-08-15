@@ -23,7 +23,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.enableCors({
-    origin: configService.get<string>('clientUrl') || '*',
+    origin: configService.get<string>('clientUrl') || 'http://localhost:3000',
     credentials: true,
   });
 

@@ -48,12 +48,14 @@ export type ProjectDialogState =
 export function ProjectDialog({
   state,
   onOpenChange,
+  onSuccess,
   createSubTask = false,
   taskId,
 }: {
   state: ProjectDialogState | null;
   onOpenChange: (open: boolean) => void;
-    createSubTask?: boolean;
+  onSuccess?: () => void;
+  createSubTask?: boolean;
   taskId?: string;
 }) {
   const [name, setName] = useState("");
@@ -201,12 +203,14 @@ export function ProjectDialog({
         state.project.id,
         payload,
       );
-
+      
       toast.success("Project updated successfully");
+      onSuccess?.();
     } else {
       await projectAPI.createProject(payload);
 
       toast.success("Project created successfully");
+      onSuccess?.();
     }
 
     onOpenChange(false);

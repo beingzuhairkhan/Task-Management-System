@@ -419,7 +419,6 @@ export function TaskDialog({
               <Select
                 value={priority}
                 onValueChange={(value) => {
-                  console.log("Selected priority:", value);
                   setPriority(value as TaskPriority);
                 }}
               >

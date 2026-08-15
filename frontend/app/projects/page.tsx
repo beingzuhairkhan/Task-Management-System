@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   PanelLeft,
   Search,
@@ -48,7 +48,7 @@ export default function ProjectsPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [query, setQuery] = useState("");
-const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
 
   const [visible, setVisible] = useState<Column[]>([...columns]);
@@ -71,15 +71,15 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
         : [...prev, c],
     );
 
-    useEffect(() => {
-  const timer = setTimeout(() => {
-    setDebouncedQuery(query);
-  }, 500);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500);
 
-  return () => clearTimeout(timer);
-}, [query]);
+    return () => clearTimeout(timer);
+  }, [query]);
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -90,8 +90,8 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
           priorityFilter === "All"
             ? undefined
             : (priorityFilter
-                .toUpperCase()
-                .replace(/\s+/g, "_") as ProjectPriority),
+              .toUpperCase()
+              .replace(/\s+/g, "_") as ProjectPriority),
 
         status:
           statusFilter === "All"
@@ -111,11 +111,14 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
         due:
           project.due ??
           (project.dueDate
-            ? new Date(project.dueDate).toLocaleDateString("en-GB", {
+            ? new Date(project.dueDate).toLocaleDateString(
+              "en-GB",
+              {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
-              })
+              },
+            )
             : "No due date"),
 
         lead: project.lead,
@@ -133,50 +136,54 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    debouncedQuery,
+    priorityFilter,
+    statusFilter,
+  ]);
 
   useEffect(() => {
     fetchProjects();
-  }, [debouncedQuery, priorityFilter, statusFilter]);
+  }, [fetchProjects]);
 
   const rows = useMemo(() => {
-  const q = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
 
-  const normalizedPriority =
-    priorityFilter === "All"
-      ? null
-      : priorityFilter.toUpperCase().replace(/\s+/g, "_");
+    const normalizedPriority =
+      priorityFilter === "All"
+        ? null
+        : priorityFilter.toUpperCase().replace(/\s+/g, "_");
 
-  const normalizedStatus =
-    statusFilter === "All"
-      ? null
-      : statusFilter.toUpperCase();
+    const normalizedStatus =
+      statusFilter === "All"
+        ? null
+        : statusFilter.toUpperCase();
 
-  return projects.filter((p) => {
-    const matchesSearch = q
-      ? p.name?.toLowerCase().includes(q)
-      : true;
+    return projects.filter((p) => {
+      const matchesSearch = q
+        ? p.name?.toLowerCase().includes(q)
+        : true;
 
-    const matchesPriority = normalizedPriority
-      ? p.priority === normalizedPriority
-      : true;
+      const matchesPriority = normalizedPriority
+        ? p.priority === normalizedPriority
+        : true;
 
-    const matchesStatus = normalizedStatus
-      ? p.status === normalizedStatus
-      : true;
+      const matchesStatus = normalizedStatus
+        ? p.status === normalizedStatus
+        : true;
 
-    return (
-      matchesSearch &&
-      matchesPriority &&
-      matchesStatus
-    );
-  });
-}, [
-  projects,
-  query,
-  priorityFilter,
-  statusFilter,
-]);
+      return (
+        matchesSearch &&
+        matchesPriority &&
+        matchesStatus
+      );
+    });
+  }, [
+    projects,
+    query,
+    priorityFilter,
+    statusFilter,
+  ]);
 
   const filtersActive =
     priorityFilter !== "All" ||
@@ -185,6 +192,8 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
   const handleDelete = async (id: string) => {
     try {
       await deleteProject(id);
+
+      await fetchProjects();
 
       toast.success("Project deleted successfully");
     } catch (error) {
@@ -524,12 +533,15 @@ const [debouncedQuery, setDebouncedQuery] = useState("");
         </div>
       </main>
 
-      <ProjectDialog
-        state={dialog}
-        onOpenChange={(open) =>
-          !open && setDialog(null)
-        }
-      />
+    <ProjectDialog
+  state={dialog}
+  onOpenChange={(open) => {
+    if (!open) {
+      setDialog(null);
+    }
+  }}
+  onSuccess={fetchProjects}
+/>
     </div>
   );
 }
