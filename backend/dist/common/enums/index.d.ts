@@ -51,7 +51,7 @@ export declare enum ActivityAction {
     MOVED = "MOVED",
     COMMENTED = "COMMENTED",
     COMMENT_DELETED = "COMMENT_DELETED",
-    DUE_DATE_CHANGED = ""
+    DUE_DATE_CHANGED = "DUE_DATE_CHANGED"
 }
 export declare enum Group {
     TODO = "TODO",
