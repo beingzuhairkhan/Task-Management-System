@@ -7,7 +7,7 @@ import { ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { groups } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
-import {normalizePriority} from './board-view'
+import { normalizePriority } from './board-view'
 import {
   GroupDot,
   LabelChip,
@@ -180,8 +180,8 @@ export function ListView({
                         {show("Priority") && (
                           <td className="hidden px-4 py-2.5 sm:table-cell">
                             <PriorityTag
-  priority={normalizePriority(task.priority)}
-/>
+                              priority={normalizePriority(task.priority)}
+                            />
                           </td>
                         )}
 
@@ -227,15 +227,15 @@ export function ListView({
                                   ) => {
                                     const labelKey =
                                       typeof label ===
-                                      "string"
+                                        "string"
                                         ? label
                                         : label.id ??
-                                          label._id ??
-                                          index;
+                                        label._id ??
+                                        index;
 
                                     const labelName =
                                       typeof label ===
-                                      "string"
+                                        "string"
                                         ? label
                                         : label.name;
 
@@ -255,12 +255,12 @@ export function ListView({
 
                               {(task.labels ?? [])
                                 .length > 2 && (
-                                <LabelChip>
-                                  +
-                                  {(task.labels ?? [])
-                                    .length - 2}
-                                </LabelChip>
-                              )}
+                                  <LabelChip>
+                                    +
+                                    {(task.labels ?? [])
+                                      .length - 2}
+                                  </LabelChip>
+                                )}
                             </div>
                           </td>
                         )}

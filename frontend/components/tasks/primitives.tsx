@@ -101,45 +101,49 @@ export function MemberStack({
 }
 
 
-const priorityMeta: Record<
-  TaskPriority,
-  {
-    className: string;
-    Icon: React.ElementType;
-  }
-> = {
-  [TaskPriority.URGENT]: {
-    className: "text-priority-urgent",
-    Icon: ChevronsUp,
-  },
-
-  [TaskPriority.HIGH]: {
-    className: "text-priority-high",
-    Icon: ChevronUp,
-  },
-
-  [TaskPriority.MEDIUM]: {
-    className: "text-priority-medium",
-    Icon: Minus,
-  },
-
-  [TaskPriority.LOW]: {
+const priorityMeta = {
+  LOW: {
     className: "text-priority-low",
     Icon: ChevronDown,
   },
-
-  [TaskPriority.NO_PRIORITY]: {
+  MEDIUM: {
+    className: "text-priority-medium",
+    Icon: Minus,
+  },
+  HIGH: {
+    className: "text-priority-high",
+    Icon: ChevronUp,
+  },
+  URGENT: {
+    className: "text-priority-urgent",
+    Icon: ChevronsUp,
+  },
+  NO_PRIORITY: {
     className: "text-muted-foreground",
     Icon: Circle,
   },
-};
+} as const;
 
 export function PriorityTag({
   priority,
 }: {
-  priority: TaskPriority;
+  priority: TaskPriority | string;
 }) {
-  const { className, Icon } = priorityMeta[priority];
+  const key = String(priority ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "_");
+
+  const meta =
+    priorityMeta[key as keyof typeof priorityMeta] ??
+    priorityMeta.NO_PRIORITY;
+
+  const { className, Icon } = meta;
+
+  const label =
+    key === "NO_PRIORITY"
+      ? "No Priority"
+      : key || "No Priority";
 
   return (
     <span
@@ -153,9 +157,7 @@ export function PriorityTag({
         strokeWidth={2.5}
       />
 
-      {priority === TaskPriority.NO_PRIORITY
-        ? "No Priority"
-        : priority}
+      {label}
     </span>
   );
 }
