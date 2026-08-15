@@ -184,6 +184,11 @@ let TaskRepository = class TaskRepository {
             model: 'User',
             select: 'username email avatar',
         })
+            .populate({
+            path: 'lead',
+            model: 'User',
+            select: 'username email avatar',
+        })
             .sort(sort)
             .skip(skip)
             .limit(limit)
@@ -235,22 +240,61 @@ let TaskRepository = class TaskRepository {
     async findManyByProject(projectId) {
         return this.taskModel.find({ projectId: new mongoose_2.Types.ObjectId(projectId) }).exec();
     }
-    buildFilter(projectId, filterDto, search) {
+    buildFilter(projectId, filterDto, search, userId, projectOwnerId, projectLeadId) {
         const filter = {
             projectId: new mongoose_2.Types.ObjectId(projectId),
         };
-        if (filterDto.status)
+        if (userId) {
+            const userObjectId = new mongoose_2.Types.ObjectId(userId);
+            const isProjectOwner = projectOwnerId &&
+                projectOwnerId.equals(userObjectId);
+            const isProjectLead = projectLeadId &&
+                projectLeadId.equals(userObjectId);
+            if (!isProjectOwner && !isProjectLead) {
+                filter.$or = [
+                    { reporter: userObjectId },
+                    { lead: userObjectId },
+                    { members: userObjectId },
+                ];
+            }
+        }
+        if (filterDto.status) {
             filter.status = filterDto.status;
-        if (filterDto.priority)
+        }
+        if (filterDto.priority) {
             filter.priority = filterDto.priority;
-        if (filterDto.groupId)
-            filter.groupId = new mongoose_2.Types.ObjectId(filterDto.groupId);
-        if (filterDto.assigneeId)
-            filter.assignees = new mongoose_2.Types.ObjectId(filterDto.assigneeId);
+        }
+        if (filterDto.group) {
+            filter.group = filterDto.group;
+        }
+        if (filterDto.members?.length) {
+            filter.members = {
+                $in: filterDto.members.map((id) => new mongoose_2.Types.ObjectId(id)),
+            };
+        }
         if (search) {
-            filter.$or = [
-                { title: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } },
+            const accessFilter = filter.$or;
+            delete filter.$or;
+            filter.$and = [
+                ...(accessFilter
+                    ? [{ $or: accessFilter }]
+                    : []),
+                {
+                    $or: [
+                        {
+                            title: {
+                                $regex: search,
+                                $options: 'i',
+                            },
+                        },
+                        {
+                            description: {
+                                $regex: search,
+                                $options: 'i',
+                            },
+                        },
+                    ],
+                },
             ];
         }
         return filter;

@@ -1,5 +1,6 @@
 import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { TaskRepository } from '../repositories/task.repository';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
@@ -16,16 +17,25 @@ import {
 } from '../../common';
 import { ActivityAction, TaskStatus, TaskPriority } from '../../common/enums';
 import { Task } from '../schemas/task.schema';
-
+import { Project } from 'src/projects/schemas/project.schema';
 @Injectable()
 export class TasksService {
   constructor(
     private readonly taskRepository: TaskRepository,
     private readonly activityService: ActivityService,
+      @InjectModel(Project.name) private projectModel: Model<Project>,
   ) { }
 
   async create(dto: CreateTaskDto, projectId: string, userId: string) {
     try {
+       const project = await this.projectModel
+      .findById(projectId)
+      .select('lead')
+      .lean();
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
       const task = await this.taskRepository.create({
         ...dto,
         projectId: new Types.ObjectId(projectId),
@@ -38,6 +48,7 @@ export class TasksService {
         priority: dto.priority || TaskPriority.MEDIUM,
         dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
+        lead:new Types.ObjectId(project.lead)
       });
 
       await this.activityService.log({
@@ -53,27 +64,41 @@ export class TasksService {
   }
 
   async findAll(
-    projectId: string,
-    filterDto: FilterTaskDto,
-    dto: PaginationDto,
-  ): Promise<PaginatedResult<any>> {
-    const filter = this.taskRepository.buildFilter(
-      projectId,
-      filterDto,
-      dto.search,
-    );
-    const sort = buildSortOption(dto.sort);
-    const page = dto.page || 1;
-    const limit = dto.limit || 20;
-    const skip = (page - 1) * limit;
+  projectId: string,
+  filterDto: FilterTaskDto,
+  dto: PaginationDto,
+  userId: string,
+): Promise<PaginatedResult<any>> {
+  const project = await this.projectModel
+  .findById(projectId)
+  .select('owner lead')
+  .lean();
 
-    const [tasks, total] = await Promise.all([
-      this.taskRepository.findAll(filter, sort, skip, limit),
-      this.taskRepository.count(filter),
-    ]);
-    return paginateResult(tasks, total, dto);
-  }
+if (!project) {
+  throw new NotFoundException('Project not found');
+}
 
+const filter = this.taskRepository.buildFilter(
+  projectId,
+  filterDto,
+  dto.search,
+  userId,
+  project.owner,
+  project.lead,
+);
+
+  const sort = buildSortOption(dto.sort);
+  const page = dto.page || 1;
+  const limit = dto.limit || 20;
+  const skip = (page - 1) * limit;
+
+  const [tasks, total] = await Promise.all([
+    this.taskRepository.findAll(filter, sort, skip, limit),
+    this.taskRepository.count(filter),
+  ]);
+
+  return paginateResult(tasks, total, dto);
+}
   async findById(id: string) {
     const task = await this.taskRepository.findById(id);
     if (!task) throw new NotFoundException('Task', id);

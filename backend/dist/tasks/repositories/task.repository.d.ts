@@ -1,4 +1,4 @@
-import { Model, FilterQuery } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { Task } from '../schemas/task.schema';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { FilterTaskDto } from '../dto/filter-task.dto';
@@ -22,5 +22,5 @@ export declare class TaskRepository {
     removeAssignee(id: string, userId: string): Promise<Task | null>;
     delete(id: string): Promise<void>;
     findManyByProject(projectId: string): Promise<Task[]>;
-    buildFilter(projectId: string, filterDto: FilterTaskDto, search?: string): FilterQuery<Task>;
+    buildFilter(projectId: string, filterDto: FilterTaskDto, search?: string, userId?: string, projectOwnerId?: Types.ObjectId, projectLeadId?: Types.ObjectId): FilterQuery<Task>;
 }

@@ -9,7 +9,7 @@ export declare class TasksController {
     private readonly tasksService;
     constructor(tasksService: TasksService);
     create(projectId: string, dto: CreateTaskDto, user: any): Promise<import("../schemas/task.schema").Task>;
-    findAll(projectId: string, filterDto: FilterTaskDto, dto: PaginationDto): Promise<import("../../common").PaginatedResult<any>>;
+    findAll(projectId: string, filterDto: FilterTaskDto, dto: PaginationDto, user: any): Promise<import("../../common").PaginatedResult<any>>;
     findOne(id: string): Promise<any>;
     update(id: string, dto: UpdateTaskDto, user: any): Promise<import("../schemas/task.schema").Task>;
     move(id: string, dto: MoveTaskDto, user: any): Promise<import("../schemas/task.schema").Task>;

@@ -8,7 +8,7 @@ import { ActivityModule } from '../activity/activity.module';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { Label, LabelSchema } from 'src/labels/schemas/label.schema';
 import { Subtask , SubtaskSchema } from 'src/subtasks/schemas/subtask.schema';
-
+import { Project , ProjectSchema } from 'src/projects/schemas/project.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([ {
@@ -26,6 +26,10 @@ import { Subtask , SubtaskSchema } from 'src/subtasks/schemas/subtask.schema';
    {
     name: Subtask.name,
     schema: SubtaskSchema,
+  },
+   {
+    name: Project.name,
+    schema: ProjectSchema,
   },
 
 ]),

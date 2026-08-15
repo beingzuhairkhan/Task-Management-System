@@ -17,27 +17,37 @@ class FilterTaskDto {
 }
 exports.FilterTaskDto = FilterTaskDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: enums_1.TaskStatus }),
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: enums_1.TaskStatus,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(enums_1.TaskStatus),
     __metadata("design:type", String)
 ], FilterTaskDto.prototype, "status", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: enums_1.TaskPriority }),
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: enums_1.TaskPriority,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(enums_1.TaskPriority),
     __metadata("design:type", String)
 ], FilterTaskDto.prototype, "priority", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by group id' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: enums_1.Group,
+    }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsEnum)(enums_1.Group),
     __metadata("design:type", String)
-], FilterTaskDto.prototype, "groupId", void 0);
+], FilterTaskDto.prototype, "group", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by assignee user id' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: [String],
+        description: 'Filter by member user IDs',
+    }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], FilterTaskDto.prototype, "assigneeId", void 0);
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsMongoId)({ each: true }),
+    __metadata("design:type", Array)
+], FilterTaskDto.prototype, "members", void 0);
 //# sourceMappingURL=filter-task.dto.js.map

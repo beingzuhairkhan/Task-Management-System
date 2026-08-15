@@ -100,6 +100,9 @@ export class Task extends Document {
     default: [],
   })
   resources: string[];
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  lead: Types.ObjectId;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

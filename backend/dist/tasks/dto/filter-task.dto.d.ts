@@ -1,7 +1,7 @@
-import { TaskPriority, TaskStatus } from '../../common/enums';
+import { Group, TaskPriority, TaskStatus } from '../../common/enums';
 export declare class FilterTaskDto {
     status?: TaskStatus;
     priority?: TaskPriority;
-    groupId?: string;
-    assigneeId?: string;
+    group?: Group;
+    members?: string[];
 }

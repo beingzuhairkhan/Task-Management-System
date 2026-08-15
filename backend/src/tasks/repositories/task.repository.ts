@@ -15,6 +15,7 @@ export class TaskRepository {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Label.name) private labelModel: Model<Label>,
     @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
+    
   ) { }
 
   async create(data: Partial<Task>): Promise<Task> {
@@ -201,6 +202,11 @@ export class TaskRepository {
         model: 'User',
         select: 'username email avatar',
       })
+       .populate({
+      path: 'lead',
+      model: 'User',
+      select: 'username email avatar',
+    })
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -285,24 +291,86 @@ export class TaskRepository {
   }
 
   buildFilter(
-    projectId: string,
-    filterDto: FilterTaskDto,
-    search?: string,
-  ): FilterQuery<Task> {
-    const filter: FilterQuery<Task> = {
-      projectId: new Types.ObjectId(projectId),
-    };
-    if (filterDto.status) filter.status = filterDto.status;
-    if (filterDto.priority) filter.priority = filterDto.priority;
-    if (filterDto.groupId) filter.groupId = new Types.ObjectId(filterDto.groupId);
-    if (filterDto.assigneeId)
-      filter.assignees = new Types.ObjectId(filterDto.assigneeId);
-    if (search) {
+  projectId: string,
+  filterDto: FilterTaskDto,
+  search?: string,
+  userId?: string,
+  projectOwnerId?: Types.ObjectId,
+  projectLeadId?: Types.ObjectId,
+): FilterQuery<Task> {
+  const filter: FilterQuery<Task> = {
+    projectId: new Types.ObjectId(projectId),
+  };
+
+  if (userId) {
+    const userObjectId = new Types.ObjectId(userId);
+
+    const isProjectOwner =
+      projectOwnerId &&
+      projectOwnerId.equals(userObjectId);
+
+    const isProjectLead =
+      projectLeadId &&
+      projectLeadId.equals(userObjectId);
+
+    // Project owner and project lead see ALL tasks
+    if (!isProjectOwner && !isProjectLead) {
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
+        { reporter: userObjectId },
+        { lead: userObjectId },
+        { members: userObjectId },
       ];
     }
-    return filter;
   }
+
+  if (filterDto.status) {
+    filter.status = filterDto.status;
+  }
+
+  if (filterDto.priority) {
+    filter.priority = filterDto.priority;
+  }
+
+  if (filterDto.group) {
+    filter.group = filterDto.group;
+  }
+
+  if (filterDto.members?.length) {
+    filter.members = {
+      $in: filterDto.members.map(
+        (id) => new Types.ObjectId(id),
+      ),
+    };
+  }
+
+  if (search) {
+    const accessFilter = filter.$or;
+
+    delete filter.$or;
+
+    filter.$and = [
+      ...(accessFilter
+        ? [{ $or: accessFilter }]
+        : []),
+      {
+        $or: [
+          {
+            title: {
+              $regex: search,
+              $options: 'i',
+            },
+          },
+          {
+            description: {
+              $regex: search,
+              $options: 'i',
+            },
+          },
+        ],
+      },
+    ];
+  }
+
+  return filter;
+}
 }

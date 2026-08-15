@@ -109,6 +109,7 @@ export class CreateTaskDto {
      @IsArray() 
      @IsString({ each: true }) 
      resources?: string[];
+   
 
 
 }

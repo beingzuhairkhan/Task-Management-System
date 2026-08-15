@@ -17,6 +17,7 @@ const activity_module_1 = require("../activity/activity.module");
 const user_schema_1 = require("../users/schemas/user.schema");
 const label_schema_1 = require("../labels/schemas/label.schema");
 const subtask_schema_1 = require("../subtasks/schemas/subtask.schema");
+const project_schema_1 = require("../projects/schemas/project.schema");
 let TasksModule = class TasksModule {
 };
 exports.TasksModule = TasksModule;
@@ -38,6 +39,10 @@ exports.TasksModule = TasksModule = __decorate([
                 {
                     name: subtask_schema_1.Subtask.name,
                     schema: subtask_schema_1.SubtaskSchema,
+                },
+                {
+                    name: project_schema_1.Project.name,
+                    schema: project_schema_1.ProjectSchema,
                 },
             ]),
             activity_module_1.ActivityModule,

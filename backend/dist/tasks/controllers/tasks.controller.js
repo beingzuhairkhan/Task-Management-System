@@ -29,8 +29,8 @@ let TasksController = class TasksController {
     create(projectId, dto, user) {
         return this.tasksService.create(dto, projectId, user._id);
     }
-    findAll(projectId, filterDto, dto) {
-        return this.tasksService.findAll(projectId, filterDto, dto);
+    findAll(projectId, filterDto, dto, user) {
+        return this.tasksService.findAll(projectId, filterDto, dto, user._id);
     }
     findOne(id) {
         return this.tasksService.findById(id);
@@ -70,9 +70,10 @@ __decorate([
     __param(0, (0, common_1.Param)('projectId')),
     __param(1, (0, common_1.Query)()),
     __param(2, (0, common_1.Query)()),
+    __param(3, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, filter_task_dto_1.FilterTaskDto,
-        common_2.PaginationDto]),
+        common_2.PaginationDto, Object]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findAll", null);
 __decorate([

@@ -48,8 +48,9 @@ export class TasksController {
     @Param('projectId') projectId: string,
     @Query() filterDto: FilterTaskDto,
     @Query() dto: PaginationDto,
+    @CurrentUser() user: any,
   ) {
-    return this.tasksService.findAll(projectId, filterDto, dto);
+    return this.tasksService.findAll(projectId, filterDto, dto , user._id);
   }
 
   @Get(':id')

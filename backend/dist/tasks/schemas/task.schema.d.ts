@@ -19,6 +19,7 @@ export declare class Task extends Document {
     createdBy: Types.ObjectId;
     updatedBy?: Types.ObjectId;
     resources: string[];
+    lead: Types.ObjectId;
 }
 export declare const TaskSchema: import("mongoose").Schema<Task, import("mongoose").Model<Task, any, any, any, Document<unknown, any, Task, any, {}> & Task & Required<{
     _id: Types.ObjectId;

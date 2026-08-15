@@ -1,25 +1,45 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { TaskPriority, TaskStatus } from '../../common/enums';
+import {
+  IsArray,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+} from 'class-validator';
+
+import {
+  Group,
+  TaskPriority,
+  TaskStatus,
+} from '../../common/enums';
 
 export class FilterTaskDto {
-  @ApiPropertyOptional({ enum: TaskStatus })
+  @ApiPropertyOptional({
+    enum: TaskStatus,
+  })
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
 
-  @ApiPropertyOptional({ enum: TaskPriority })
+  @ApiPropertyOptional({
+    enum: TaskPriority,
+  })
   @IsOptional()
   @IsEnum(TaskPriority)
   priority?: TaskPriority;
 
-  @ApiPropertyOptional({ description: 'Filter by group id' })
+  @ApiPropertyOptional({
+    enum: Group,
+  })
   @IsOptional()
-  @IsString()
-  groupId?: string;
+  @IsEnum(Group)
+  group?: Group;
 
-  @ApiPropertyOptional({ description: 'Filter by assignee user id' })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Filter by member user IDs',
+  })
   @IsOptional()
-  @IsString()
-  assigneeId?: string;
+  @IsArray()
+  @IsMongoId({ each: true })
+  members?: string[];
 }

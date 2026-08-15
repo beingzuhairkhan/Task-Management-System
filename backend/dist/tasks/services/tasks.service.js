@@ -8,21 +8,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TasksService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("mongoose");
+const mongoose_2 = require("@nestjs/mongoose");
 const task_repository_1 = require("../repositories/task.repository");
 const activity_service_1 = require("../../activity/services/activity.service");
 const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
+const project_schema_1 = require("../../projects/schemas/project.schema");
 let TasksService = class TasksService {
-    constructor(taskRepository, activityService) {
+    constructor(taskRepository, activityService, projectModel) {
         this.taskRepository = taskRepository;
         this.activityService = activityService;
+        this.projectModel = projectModel;
     }
     async create(dto, projectId, userId) {
         try {
+            const project = await this.projectModel
+                .findById(projectId)
+                .select('lead')
+                .lean();
+            if (!project) {
+                throw new common_2.NotFoundException('Project not found');
+            }
             const task = await this.taskRepository.create({
                 ...dto,
                 projectId: new mongoose_1.Types.ObjectId(projectId),
@@ -35,6 +48,7 @@ let TasksService = class TasksService {
                 priority: dto.priority || enums_1.TaskPriority.MEDIUM,
                 dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
                 startDate: dto.startDate ? new Date(dto.startDate) : undefined,
+                lead: new mongoose_1.Types.ObjectId(project.lead)
             });
             await this.activityService.log({
                 taskId: String(task._id),
@@ -47,8 +61,15 @@ let TasksService = class TasksService {
             throw err;
         }
     }
-    async findAll(projectId, filterDto, dto) {
-        const filter = this.taskRepository.buildFilter(projectId, filterDto, dto.search);
+    async findAll(projectId, filterDto, dto, userId) {
+        const project = await this.projectModel
+            .findById(projectId)
+            .select('owner lead')
+            .lean();
+        if (!project) {
+            throw new common_2.NotFoundException('Project not found');
+        }
+        const filter = this.taskRepository.buildFilter(projectId, filterDto, dto.search, userId, project.owner, project.lead);
         const sort = (0, common_2.buildSortOption)(dto.sort);
         const page = dto.page || 1;
         const limit = dto.limit || 20;
@@ -263,7 +284,9 @@ let TasksService = class TasksService {
 exports.TasksService = TasksService;
 exports.TasksService = TasksService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, mongoose_2.InjectModel)(project_schema_1.Project.name)),
     __metadata("design:paramtypes", [task_repository_1.TaskRepository,
-        activity_service_1.ActivityService])
+        activity_service_1.ActivityService,
+        mongoose_1.Model])
 ], TasksService);
 //# sourceMappingURL=tasks.service.js.map
