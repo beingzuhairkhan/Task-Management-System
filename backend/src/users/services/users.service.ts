@@ -23,9 +23,8 @@ export class UsersService {
   ) {
     this.transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: Number(this.configService.get<string>("mail.port")),
-      secure:
-        this.configService.get<string>("mail.secure") === "true",
+      port: 465,
+      secure: true,
 
       auth: {
         user: this.configService.get<string>("mail.user"),
@@ -35,9 +34,7 @@ export class UsersService {
       connectionTimeout: 30000,
       greetingTimeout: 30000,
       socketTimeout: 60000,
-
-      family: 4,
-    } as any);
+    });
   }
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {
