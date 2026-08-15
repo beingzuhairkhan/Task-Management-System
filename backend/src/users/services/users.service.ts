@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException , Logger } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { InviteUserDto } from '../dto/invite-user.dto';
@@ -12,33 +12,50 @@ import {
 } from '../../common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-
+import type { SMTPTransport } from "nodemailer";
 @Injectable()
 export class UsersService {
-    private readonly transporter: nodemailer.Transporter;
-      private readonly logger = new Logger(UsersService.name);
+  private readonly transporter: nodemailer.Transporter;
+  private readonly logger = new Logger(UsersService.name);
 
   constructor(private readonly userRepository: UserRepository,
-     private readonly configService: ConfigService,
-  ) { this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('mail.host'),
-       port: 465,
-       secure: true,
+    private readonly configService: ConfigService,
+  ) {
+    const smtpOptions: SMTPTransport.Options = {
+    host: this.configService.get<string>("mail.host"),
+    port: Number(this.configService.get<string>("mail.port")),
+    secure:
+      this.configService.get<string>("mail.secure") === "true",
 
-      auth: {
-        user: this.configService.get<string>('mail.user'),
-        pass: this.configService.get<string>('mail.password'),
-      },
-    });
-     this.transporter
+    // Force IPv4 on Render
+    family: 4,
+
+    auth: {
+      user: this.configService.get<string>("mail.user"),
+      pass: this.configService.get<string>("mail.password"),
+    },
+
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000,
+  };
+
+  this.transporter = nodemailer.createTransport(
+    smtpOptions,
+  );
+
+  this.transporter
     .verify()
     .then(() => {
-      this.logger.log('Gmail SMTP connection successful');
+      this.logger.log("Gmail SMTP connection successful");
     })
     .catch((error) => {
-      this.logger.error(' Gmail SMTP connection failed' ,error.message);
+      this.logger.error(
+        `Gmail SMTP connection failed: ${error.code ?? "UNKNOWN"}`,
+      );
+      this.logger.error(error.message);
     });
-  }
+}
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {
     const filter = buildSearchFilter(dto.search, ['username', 'email', 'jobTitle']);
@@ -88,15 +105,15 @@ export class UsersService {
 
     const frontendUrl = this.configService.get<string>('clientUrl');
 
-    const inviteUrl =`${frontendUrl}`;
+    const inviteUrl = `${frontendUrl}`;
 
 
     try {
-  const result = await this.transporter.sendMail({
-    from: this.configService.get<string>("mail.from"),
-    to: email,
-    subject: "You have been invited in Task Management System",
-    html: `
+      const result = await this.transporter.sendMail({
+        from: this.configService.get<string>("mail.from"),
+        to: email,
+        subject: "You have been invited in Task Management System",
+        html: `
       <!DOCTYPE html>
       <html>
         <body
@@ -145,19 +162,19 @@ export class UsersService {
         </body>
       </html>
     `,
-  });
+      });
 
-  this.logger.log(`Email sent: ${result.messageId}`);
-} catch (error) {
-  this.logger.error(
-    "Failed to send invitation email",
-    error instanceof Error ? error.stack : String(error),
-  );
+      this.logger.log(`Email sent: ${result.messageId}`);
+    } catch (error) {
+      this.logger.error(
+        "Failed to send invitation email",
+        error instanceof Error ? error.stack : String(error),
+      );
 
-  throw new InternalServerErrorException(
-    "Failed to send invitation email",
-  );
-}
+      throw new InternalServerErrorException(
+        "Failed to send invitation email",
+      );
+    }
     return {
       message: 'Invitation sent successfully',
       email,

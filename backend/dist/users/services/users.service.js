@@ -54,22 +54,28 @@ let UsersService = UsersService_1 = class UsersService {
         this.userRepository = userRepository;
         this.configService = configService;
         this.logger = new common_1.Logger(UsersService_1.name);
-        this.transporter = nodemailer.createTransport({
-            host: this.configService.get('mail.host'),
-            port: 465,
-            secure: true,
+        const smtpOptions = {
+            host: this.configService.get("mail.host"),
+            port: Number(this.configService.get("mail.port")),
+            secure: this.configService.get("mail.secure") === "true",
+            family: 4,
             auth: {
-                user: this.configService.get('mail.user'),
-                pass: this.configService.get('mail.password'),
+                user: this.configService.get("mail.user"),
+                pass: this.configService.get("mail.password"),
             },
-        });
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
+        };
+        this.transporter = nodemailer.createTransport(smtpOptions);
         this.transporter
             .verify()
             .then(() => {
-            this.logger.log('Gmail SMTP connection successful');
+            this.logger.log("Gmail SMTP connection successful");
         })
             .catch((error) => {
-            this.logger.error(' Gmail SMTP connection failed', error.message);
+            this.logger.error(`Gmail SMTP connection failed: ${error.code ?? "UNKNOWN"}`);
+            this.logger.error(error.message);
         });
     }
     async findAll(dto) {
