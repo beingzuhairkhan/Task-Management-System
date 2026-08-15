@@ -1,9 +1,9 @@
 export enum TaskPriority {
-  MEDIUM = "Medium",
-  LOW = "Low",
-  HIGH = "High",
-  URGENT = "Urgent",
-  NO_PRIORITY = "No Priority",
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  URGENT = "URGENT",
+  NO_PRIORITY = "NO_PRIORITY",
 }
 
 export enum TaskStatus {

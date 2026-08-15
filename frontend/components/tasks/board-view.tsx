@@ -22,13 +22,13 @@ import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
 import { normalizeStatus } from "./task-dialog";
 import { TasksBoardSkeleton } from "@/components/tasks/tasks-board-skeleton";
-import {TaskPriority} from "@/lib/tasks-data"
+import { TaskPriority } from "@/lib/tasks-data"
 type BoardViewProps = {
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
 };
 
- export const normalizePriority = (
+export const normalizePriority = (
   priority: unknown,
 ): TaskPriority => {
   const value = String(priority ?? "")
@@ -73,30 +73,30 @@ export function BoardView({
   const show = (field: string) =>
     fields.includes(field);
 
- 
+
   if (loading) {
     return <TasksBoardSkeleton />;
   }
 
- 
+
 
   return (
     <div>
       {/* Board */}
       <div className="grid min-w-0 grid-cols-1 gap-3 p-6 md:grid-cols-2 xl:grid-cols-4">
         {groups.map((group) => {
-        
+
           const normalizedGroupId = group.id
             .toUpperCase()
             .replace("-", "_");
 
-         
+
           const tasks = allTasks.filter(
             (task: any) => {
               const taskGroup = String(
                 task.group ??
-                  task.groupId ??
-                  "",
+                task.groupId ??
+                "",
               )
                 .toUpperCase()
                 .replace("-", "_");
@@ -175,153 +175,153 @@ export function BoardView({
                       {(show("Members") ||
                         show("Due Date") ||
                         show("Reporter")) && (
-                        <div className="flex w-full items-center justify-between">
-                          {/* Members */}
-                          {show("Members") && (
-                            <div className="left-0">
-                              <MemberStack
-                                members={(
-                                  task.members ??
-                                  []
-                                ).map(
-                                  (
-                                    member: any,
-                                  ) => ({
-                                    id: member.id,
-                                    username:
-                                      member.username,
-                                    email:
-                                      member.email,
-                                    avatar:
-                                      member.avatar,
-                                  }),
-                                )}
-                              />
-                            </div>
-                          )}
+                          <div className="flex w-full items-center justify-between">
+                            {/* Members */}
+                            {show("Members") && (
+                              <div className="left-0">
+                                <MemberStack
+                                  members={(
+                                    task.members ??
+                                    []
+                                  ).map(
+                                    (
+                                      member: any,
+                                    ) => ({
+                                      id: member.id,
+                                      username:
+                                        member.username,
+                                      email:
+                                        member.email,
+                                      avatar:
+                                        member.avatar,
+                                    }),
+                                  )}
+                                />
+                              </div>
+                            )}
 
-                          {/* Reporter + Due Date */}
-                          {(show("Reporter") ||
-                            show("Due Date")) && (
-                            <div className="ml-auto flex items-center gap-2">
-                              {/* Reporter */}
-                              {show(
-                                "Reporter",
-                              ) &&
-                                task.reporter && (
-                                  <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-avatar-violet text-[10px] font-bold text-avatar-violet-foreground">
-                                    {(() => {
-                                      const avatar =
-                                        getAvatarOrInitials(
-                                          task
-                                            .reporter
-                                            .username,
-                                          task
-                                            .reporter
-                                            .avatar,
-                                        );
+                            {/* Reporter + Due Date */}
+                            {(show("Reporter") ||
+                              show("Due Date")) && (
+                                <div className="ml-auto flex items-center gap-2">
+                                  {/* Reporter */}
+                                  {show(
+                                    "Reporter",
+                                  ) &&
+                                    task.reporter && (
+                                      <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-avatar-violet text-[10px] font-bold text-avatar-violet-foreground">
+                                        {(() => {
+                                          const avatar =
+                                            getAvatarOrInitials(
+                                              task
+                                                .reporter
+                                                .username,
+                                              task
+                                                .reporter
+                                                .avatar,
+                                            );
 
-                                      return task.reporter.avatar?.trim() ? (
-                                        <img
-                                          src={
+                                          return task.reporter.avatar?.trim() ? (
+                                            <img
+                                              src={
+                                                avatar
+                                              }
+                                              alt={
+                                                task
+                                                  .reporter
+                                                  .username
+                                              }
+                                              className="size-full object-cover"
+                                            />
+                                          ) : (
                                             avatar
-                                          }
-                                          alt={
-                                            task
-                                              .reporter
-                                              .username
-                                          }
-                                          className="size-full object-cover"
-                                        />
-                                      ) : (
-                                        avatar
-                                      );
-                                    })()}
-                                  </span>
-                                )}
+                                          );
+                                        })()}
+                                      </span>
+                                    )}
 
-                              {/* Due Date */}
-                              {show(
-                                "Due Date",
-                              ) && (
-                                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                                  <CalendarDays className="size-3" />
+                                  {/* Due Date */}
+                                  {show(
+                                    "Due Date",
+                                  ) && (
+                                      <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                        <CalendarDays className="size-3" />
 
-                                  {task.dueDate
-                                    ? new Date(
-                                        task.dueDate,
-                                      ).toLocaleDateString(
-                                        "en-GB",
-                                        {
-                                          day: "2-digit",
-                                          month: "short",
-                                        },
-                                      )
-                                    : "No due date"}
-                                </span>
+                                        {task.dueDate
+                                          ? new Date(
+                                            task.dueDate,
+                                          ).toLocaleDateString(
+                                            "en-GB",
+                                            {
+                                              day: "2-digit",
+                                              month: "short",
+                                            },
+                                          )
+                                          : "No due date"}
+                                      </span>
+                                    )}
+                                </div>
                               )}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
 
                       {/* Priority + Status + Labels */}
                       {(show("Priority") ||
                         show("Labels") ||
                         show("Status")) && (
-                        <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-border pt-2.5">
-                          {/* Priority */}
-                          {show(
-                            "Priority",
-                          ) && (
-                            <PriorityTag
-  priority={normalizePriority(task.priority)}
-/>
-                          )}
-
-                          {/* Status */}
-                          {show(
-                            "Status",
-                          ) && (
-                            <LabelChip
-                              status={normalizeStatus(
-                                task.status,
+                          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-border pt-2.5">
+                            {/* Priority */}
+                            {show(
+                              "Priority",
+                            ) && (
+                                <PriorityTag
+                                  priority={normalizePriority(task.priority)}
+                                />
                               )}
-                            >
-                              {task.status}
-                            </LabelChip>
-                          )}
 
-                          {/* Labels */}
-                          {show(
-                            "Labels",
-                          ) &&
-                            (
-                              task.labels ??
-                              []
-                            )
-                              .slice(0, 3)
-                              .map(
-                                (
-                                  label: any,
-                                ) => (
-                                  <LabelChip
-                                    key={
-                                      typeof label ===
-                                      "string"
+                            {/* Status */}
+                            {show(
+                              "Status",
+                            ) && (
+                                <LabelChip
+                                  status={normalizeStatus(
+                                    task.status,
+                                  )}
+                                >
+                                  {task.status}
+                                </LabelChip>
+                              )}
+
+                            {/* Labels */}
+                            {show(
+                              "Labels",
+                            ) &&
+                              (
+                                task.labels ??
+                                []
+                              )
+                                .slice(0, 3)
+                                .map(
+                                  (
+                                    label: any,
+                                  ) => (
+                                    <LabelChip
+                                      key={
+                                        typeof label ===
+                                          "string"
+                                          ? label
+                                          : label.id
+                                      }
+                                    >
+                                      {typeof label ===
+                                        "string"
                                         ? label
-                                        : label.id
-                                    }
-                                  >
-                                    {typeof label ===
-                                    "string"
-                                      ? label
-                                      : label.name}
-                                  </LabelChip>
-                                ),
-                              )}
-                        </div>
-                      )}
+                                        : label.name}
+                                    </LabelChip>
+                                  ),
+                                )}
+                          </div>
+                        )}
                     </article>
                   ),
                 )}

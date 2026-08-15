@@ -101,20 +101,61 @@ export function MemberStack({
 }
 
 
-const priorityMeta = {
-  URGENT: { className: "text-priority-urgent", Icon: ChevronsUp },
-  HIGH: { className: "text-priority-high", Icon: ChevronUp },
-  MEDIUM: { className: "text-priority-medium", Icon: Minus },
-  LOW: { className: "text-priority-low", Icon: ChevronDown },
-  "No Priority": { className: "text-muted-foreground", Icon: Circle },
-} as any;
+const priorityMeta: Record<
+  TaskPriority,
+  {
+    className: string;
+    Icon: React.ElementType;
+  }
+> = {
+  [TaskPriority.URGENT]: {
+    className: "text-priority-urgent",
+    Icon: ChevronsUp,
+  },
 
-export function PriorityTag({ priority }: { priority: TaskPriority }) {
-  const { className, Icon } = priorityMeta[priority] ?? priorityMeta["No Priority"];
+  [TaskPriority.HIGH]: {
+    className: "text-priority-high",
+    Icon: ChevronUp,
+  },
+
+  [TaskPriority.MEDIUM]: {
+    className: "text-priority-medium",
+    Icon: Minus,
+  },
+
+  [TaskPriority.LOW]: {
+    className: "text-priority-low",
+    Icon: ChevronDown,
+  },
+
+  [TaskPriority.NO_PRIORITY]: {
+    className: "text-muted-foreground",
+    Icon: Circle,
+  },
+};
+
+export function PriorityTag({
+  priority,
+}: {
+  priority: TaskPriority;
+}) {
+  const { className, Icon } = priorityMeta[priority];
+
   return (
-    <span className={cn("inline-flex items-center gap-1 text-xs font-medium", className)}>
-      <Icon className="size-3.5" strokeWidth={2.5} />
-      {priority}
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 text-xs font-medium",
+        className,
+      )}
+    >
+      <Icon
+        className="size-3.5 shrink-0"
+        strokeWidth={2.5}
+      />
+
+      {priority === TaskPriority.NO_PRIORITY
+        ? "No Priority"
+        : priority}
     </span>
   );
 }
