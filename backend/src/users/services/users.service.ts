@@ -12,7 +12,7 @@ import {
 } from '../../common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-import type { SMTPTransport } from "nodemailer";
+
 @Injectable()
 export class UsersService {
   private readonly transporter: nodemailer.Transporter;
@@ -21,41 +21,26 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
   ) {
-    const smtpOptions: SMTPTransport.Options = {
-    host: this.configService.get<string>("mail.host"),
-    port: Number(this.configService.get<string>("mail.port")),
-    secure:
-      this.configService.get<string>("mail.secure") === "true",
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get<string>('mail.host'),
+      port: 465,
+      secure: true,
+      family: 4,
 
-    // Force IPv4 on Render
-    family: 4,
-
-    auth: {
-      user: this.configService.get<string>("mail.user"),
-      pass: this.configService.get<string>("mail.password"),
-    },
-
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 60000,
-  };
-
-  this.transporter = nodemailer.createTransport(
-    smtpOptions,
-  );
-
-  this.transporter
-    .verify()
-    .then(() => {
-      this.logger.log("Gmail SMTP connection successful");
-    })
-    .catch((error) => {
-      this.logger.error(
-        `Gmail SMTP connection failed: ${error.code ?? "UNKNOWN"}`,
-      );
-      this.logger.error(error.message);
+      auth: {
+        user: this.configService.get<string>('mail.user'),
+        pass: this.configService.get<string>('mail.password'),
+      },
     });
-}
+    this.transporter
+      .verify()
+      .then(() => {
+        this.logger.log('Gmail SMTP connection successful');
+      })
+      .catch((error) => {
+        this.logger.error(' Gmail SMTP connection failed', error.message);
+      });
+  }
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {
     const filter = buildSearchFilter(dto.search, ['username', 'email', 'jobTitle']);
