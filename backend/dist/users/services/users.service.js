@@ -55,7 +55,7 @@ let UsersService = UsersService_1 = class UsersService {
         this.configService = configService;
         this.logger = new common_1.Logger(UsersService_1.name);
         this.transporter = nodemailer.createTransport({
-            host: this.configService.get("mail.host"),
+            host: "smtp.gmail.com",
             port: Number(this.configService.get("mail.port")),
             secure: this.configService.get("mail.secure") === "true",
             auth: {

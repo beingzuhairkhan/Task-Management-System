@@ -22,7 +22,7 @@ export class UsersService {
     private readonly configService: ConfigService,
   ) {
     this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>("mail.host"),
+      host: "smtp.gmail.com",
       port: Number(this.configService.get<string>("mail.port")),
       secure:
         this.configService.get<string>("mail.secure") === "true",
