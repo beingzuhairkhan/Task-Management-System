@@ -18,12 +18,14 @@ import {
 import { ActivityAction, TaskStatus, TaskPriority } from '../../common/enums';
 import { Task } from '../schemas/task.schema';
 import { Project } from 'src/projects/schemas/project.schema';
+import { Subtask, } from 'src/subtasks/schemas/subtask.schema';
 @Injectable()
 export class TasksService {
   constructor(
     private readonly taskRepository: TaskRepository,
     private readonly activityService: ActivityService,
     @InjectModel(Project.name) private projectModel: Model<Project>,
+     @InjectModel(Subtask.name) private subTaskModel: Model<Subtask>,
   ) { }
 
   async create(dto: CreateTaskDto, projectId: string, userId: string) {
@@ -76,6 +78,29 @@ export class TasksService {
 
     if (!project) {
       throw new NotFoundException('Project not found');
+    }
+
+    const userObjectId = new Types.ObjectId(userId);
+
+    const isProjectOwner =
+      project.owner?.equals(userObjectId);
+
+    const isProjectLead =
+      project.lead?.equals(userObjectId);
+
+    let subTaskTaskIds: Types.ObjectId[] = [];
+
+    if (!isProjectOwner && !isProjectLead) {
+      const subTasks = await this.subTaskModel
+        .find({
+          subMembers: userObjectId,
+        })
+        .select('taskId')
+        .lean();
+
+      subTaskTaskIds = subTasks.map(
+        (subTask) => subTask.taskId,
+      );
     }
 
     const filter = this.taskRepository.buildFilter(
