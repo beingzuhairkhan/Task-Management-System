@@ -33,8 +33,7 @@ const config = () => ({
         secure: process.env.MAIL_SECURE === 'true',
         user: process.env.MAIL_USER || '',
         password: process.env.MAIL_PASSWORD || '',
-        from: process.env.MAIL_FROM ||
-            process.env.MAIL_USER ||
+        from: process.env.MAIL_USER ||
             '',
     },
     redis: process.env.REDIS_URL

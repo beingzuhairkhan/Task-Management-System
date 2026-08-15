@@ -22,9 +22,8 @@ export class UsersService {
      private readonly configService: ConfigService,
   ) { this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('mail.host'),
-      port: Number(this.configService.get<string>('mail.port')),
-      secure:
-        this.configService.get<string>('mail.secure') === 'true',
+       port: 465,
+       secure: true,
 
       auth: {
         user: this.configService.get<string>('mail.user'),
@@ -93,75 +92,72 @@ export class UsersService {
 
 
     try {
-      const result =
-        await this.transporter.sendMail({
-          from: this.configService.get<string>(
-            'mail.from',
-          ),
+  const result = await this.transporter.sendMail({
+    from: this.configService.get<string>("mail.from"),
+    to: email,
+    subject: "You have been invited in Task Management System",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <body
+          style="
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+          "
+        >
+          <div
+            style="
+              max-width: 600px;
+              margin: auto;
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+            "
+          >
+            <h2>You have been invited!</h2>
 
-          to: email,
+            <p>
+              You have received an invitation
+              to join our platform.
+            </p>
 
-          subject: 'You have been invited in Task Management System',
+            <p>
+              Click the button below to accept
+              the invitation.
+            </p>
 
-          html: `
-            <!DOCTYPE html>
-            <html>
-              <body
-                style="
-                  font-family: Arial, sans-serif;
-                  background: #f5f5f5;
-                  padding: 40px;
-                "
-              >
-                <div
-                  style="
-                    max-width: 600px;
-                    margin: auto;
-                    background: white;
-                    padding: 30px;
-                    border-radius: 10px;
-                  "
-                >
-                  <h2>You have been invited!</h2>
+            <a
+              href="${inviteUrl}"
+              style="
+                display: inline-block;
+                padding: 12px 24px;
+                background: #2563eb;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                margin: 20px 0;
+              "
+            >
+              Accept Invitation
+            </a>
+          </div>
+        </body>
+      </html>
+    `,
+  });
 
-                  <p>
-                    You have received an invitation
-                    to join our platform.
-                  </p>
+  this.logger.log(`Email sent: ${result.messageId}`);
+} catch (error) {
+  this.logger.error(
+    "Failed to send invitation email",
+    error instanceof Error ? error.stack : String(error),
+  );
 
-                  <p>
-                    Click the button below to accept
-                    the invitation.
-                  </p>
-
-                  <a
-                    href="${inviteUrl}"
-                    style="
-                      display: inline-block;
-                      padding: 12px 24px;
-                      background: #2563eb;
-                      color: white;
-                      text-decoration: none;
-                      border-radius: 6px;
-                      margin: 20px 0;
-                    "
-                  >
-                    Accept Invitation
-                  </a>
-
-                </div>
-              </body>
-            </html>
-          `,
-        });
-
-    } catch (error) {
-
-      throw new InternalServerErrorException(
-        'Failed to send invitation email',
-      );
-    }
-
+  throw new InternalServerErrorException(
+    "Failed to send invitation email",
+  );
+}
     return {
       message: 'Invitation sent successfully',
       email,

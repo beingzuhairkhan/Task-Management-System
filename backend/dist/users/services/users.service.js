@@ -56,8 +56,8 @@ let UsersService = UsersService_1 = class UsersService {
         this.logger = new common_1.Logger(UsersService_1.name);
         this.transporter = nodemailer.createTransport({
             host: this.configService.get('mail.host'),
-            port: Number(this.configService.get('mail.port')),
-            secure: this.configService.get('mail.secure') === 'true',
+            port: 465,
+            secure: true,
             auth: {
                 user: this.configService.get('mail.user'),
                 pass: this.configService.get('mail.password'),
@@ -112,63 +112,64 @@ let UsersService = UsersService_1 = class UsersService {
         const inviteUrl = `${frontendUrl}`;
         try {
             const result = await this.transporter.sendMail({
-                from: this.configService.get('mail.from'),
+                from: this.configService.get("mail.from"),
                 to: email,
-                subject: 'You have been invited in Task Management System',
+                subject: "You have been invited in Task Management System",
                 html: `
-            <!DOCTYPE html>
-            <html>
-              <body
-                style="
-                  font-family: Arial, sans-serif;
-                  background: #f5f5f5;
-                  padding: 40px;
-                "
-              >
-                <div
-                  style="
-                    max-width: 600px;
-                    margin: auto;
-                    background: white;
-                    padding: 30px;
-                    border-radius: 10px;
-                  "
-                >
-                  <h2>You have been invited!</h2>
+      <!DOCTYPE html>
+      <html>
+        <body
+          style="
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+          "
+        >
+          <div
+            style="
+              max-width: 600px;
+              margin: auto;
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+            "
+          >
+            <h2>You have been invited!</h2>
 
-                  <p>
-                    You have received an invitation
-                    to join our platform.
-                  </p>
+            <p>
+              You have received an invitation
+              to join our platform.
+            </p>
 
-                  <p>
-                    Click the button below to accept
-                    the invitation.
-                  </p>
+            <p>
+              Click the button below to accept
+              the invitation.
+            </p>
 
-                  <a
-                    href="${inviteUrl}"
-                    style="
-                      display: inline-block;
-                      padding: 12px 24px;
-                      background: #2563eb;
-                      color: white;
-                      text-decoration: none;
-                      border-radius: 6px;
-                      margin: 20px 0;
-                    "
-                  >
-                    Accept Invitation
-                  </a>
-
-                </div>
-              </body>
-            </html>
-          `,
+            <a
+              href="${inviteUrl}"
+              style="
+                display: inline-block;
+                padding: 12px 24px;
+                background: #2563eb;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                margin: 20px 0;
+              "
+            >
+              Accept Invitation
+            </a>
+          </div>
+        </body>
+      </html>
+    `,
             });
+            this.logger.log(`Email sent: ${result.messageId}`);
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException('Failed to send invitation email');
+            this.logger.error("Failed to send invitation email", error instanceof Error ? error.stack : String(error));
+            throw new common_1.InternalServerErrorException("Failed to send invitation email");
         }
         return {
             message: 'Invitation sent successfully',

@@ -114,18 +114,6 @@ const handleLogout = async () => {
             Back to app
           </Link>
 
-          {/* Search */}
-          <div className="mb-4 flex items-center gap-2 rounded-md border border-border bg-card px-2">
-            <Search className="size-4 shrink-0 text-muted-foreground" />
-
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search"
-              className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
-            />
-          </div>
-
           {/* Sections */}
           <nav className="space-y-0.5">
             {filtered.map(({ id, label, icon: Icon }) => (
