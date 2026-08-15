@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronDown, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { groups, TaskPriority } from "@/lib/tasks-data";
+import { groups } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
 
 import {
@@ -21,24 +21,18 @@ import type { TaskDialogState } from "./task-dialog";
 import { TaskListSkeleton } from "./TaskListSkeleton";
 
 type ListViewProps = {
-  query: string;
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
-  priorityFilter: TaskPriority | "All";
 };
 
 export function ListView({
-  query,
   onDialog,
   fields,
-  priorityFilter,
 }: ListViewProps) {
   const { tasks: allTasks, loading } = useTasks();
 
   const [collapsed, setCollapsed] =
     useState<Record<string, boolean>>({});
-
-  const q = query.trim().toLowerCase();
 
   const show = (field: string) =>
     fields.includes(field);
@@ -63,37 +57,23 @@ export function ListView({
       {groups.map((group) => {
         const isOpen = !collapsed[group.id];
 
-
-        const normalizedGroupId = group.id
+        /*
+         * Filtering is handled by TasksProvider/server API.
+         * Here we only filter by group so tasks appear
+         * under the correct board/list section.
+         */
+        const normalizedGroupId = String(group.id)
           .toUpperCase()
-          .replace("-", "_");
+          .replace(/-/g, "_");
 
         const groupTasks = allTasks.filter((task: any) => {
           const taskGroup = String(
             task.group ?? task.groupId ?? "",
           )
             .toUpperCase()
-            .replace("-", "_");
+            .replace(/-/g, "_");
 
-          const matchesGroup =
-            taskGroup === normalizedGroupId;
-
-          const matchesQuery = q
-            ? String(task.title ?? "")
-              .toLowerCase()
-              .includes(q)
-            : true;
-
-          const matchesPriority =
-            priorityFilter === "All"
-              ? true
-              : task.priority === priorityFilter;
-
-          return (
-            matchesGroup &&
-            matchesQuery &&
-            matchesPriority
-          );
+          return taskGroup === normalizedGroupId;
         });
 
         return (
@@ -131,46 +111,54 @@ export function ListView({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface text-left text-xs text-muted-foreground">
+                      {/* Task */}
                       <th className="px-4 py-2.5 font-medium">
                         Task
                       </th>
 
+                      {/* Priority */}
                       {show("Priority") && (
                         <th className="hidden px-4 py-2.5 font-medium sm:table-cell">
                           Priority
                         </th>
                       )}
 
+                      {/* Members */}
                       {show("Members") && (
                         <th className="hidden px-4 py-2.5 font-medium sm:table-cell">
                           Members
                         </th>
                       )}
 
+                      {/* Status */}
                       {show("Status") && (
                         <th className="hidden px-4 py-2.5 font-medium md:table-cell">
                           Status
                         </th>
                       )}
 
+                      {/* Labels */}
                       {show("Labels") && (
                         <th className="hidden px-4 py-2.5 font-medium md:table-cell">
                           Labels
                         </th>
                       )}
 
+                      {/* Reporter */}
                       {show("Reporter") && (
                         <th className="hidden px-4 py-2.5 font-medium md:table-cell">
                           Reporter
                         </th>
                       )}
 
+                      {/* Due Date */}
                       {show("Due Date") && (
                         <th className="hidden px-4 py-2.5 font-medium md:table-cell">
                           Due Date
                         </th>
                       )}
 
+                      {/* Actions */}
                       <th className="w-12 px-4 py-2.5 text-right font-medium">
                         Actions
                       </th>
@@ -180,13 +168,13 @@ export function ListView({
                   <tbody>
                     {groupTasks.map((task: any) => (
                       <tr
-                        key={task.id}
+                        key={task.id ?? task._id}
                         className="border-b border-border last:border-0 hover:bg-surface"
                       >
                         {/* Task */}
                         <td className="px-4 py-2.5 font-medium">
                           <Link
-                            href={`/task/${task.id}`}
+                            href={`/task/${task.id ?? task._id}`}
                             className="hover:underline"
                           >
                             {task.title}
@@ -197,7 +185,9 @@ export function ListView({
                         {show("Priority") && (
                           <td className="hidden px-4 py-2.5 sm:table-cell">
                             <PriorityTag
-                              priority={task.priority.replace(/_/g, " ")}
+                              priority={String(
+                                task.priority ?? "",
+                              ).replace(/_/g, " ")}
                             />
                           </td>
                         )}
@@ -206,7 +196,9 @@ export function ListView({
                         {show("Members") && (
                           <td className="hidden px-4 py-2.5 sm:table-cell">
                             <MemberStack
-                              members={task.members ?? []}
+                              members={
+                                task.members ?? []
+                              }
                             />
                           </td>
                         )}
@@ -214,8 +206,17 @@ export function ListView({
                         {/* Status */}
                         {show("Status") && (
                           <td className="hidden px-4 py-2.5 md:table-cell">
-                            <LabelChip status={task.status}>
-                              {task.status}
+                            <LabelChip
+                              status={
+                                task.status ?? ""
+                              }
+                            >
+                              {String(
+                                task.status ?? "",
+                              ).replace(
+                                /_/g,
+                                " ",
+                              )}
                             </LabelChip>
                           </td>
                         )}
@@ -229,31 +230,44 @@ export function ListView({
                                 .map(
                                   (
                                     label: any,
-                                  ) => (
-                                    <LabelChip
-                                      key={
-                                        typeof label ===
-                                          "string"
-                                          ? label
-                                          : label.id
-                                      }
-                                    >
-                                      {typeof label ===
-                                        "string"
+                                    index: number,
+                                  ) => {
+                                    const labelKey =
+                                      typeof label ===
+                                      "string"
                                         ? label
-                                        : label.name}
-                                    </LabelChip>
-                                  ),
+                                        : label.id ??
+                                          label._id ??
+                                          index;
+
+                                    const labelName =
+                                      typeof label ===
+                                      "string"
+                                        ? label
+                                        : label.name;
+
+                                    return (
+                                      <LabelChip
+                                        key={
+                                          labelKey
+                                        }
+                                      >
+                                        {
+                                          labelName
+                                        }
+                                      </LabelChip>
+                                    );
+                                  },
                                 )}
 
                               {(task.labels ?? [])
                                 .length > 2 && (
-                                  <LabelChip>
-                                    +
-                                    {task.labels
-                                      .length - 2}
-                                  </LabelChip>
-                                )}
+                                <LabelChip>
+                                  +
+                                  {(task.labels ?? [])
+                                    .length - 2}
+                                </LabelChip>
+                              )}
                             </div>
                           </td>
                         )}
@@ -274,8 +288,8 @@ export function ListView({
                         {/* Due Date */}
                         {show("Due Date") && (
                           <td className="hidden px-4 py-2.5 text-muted-foreground md:table-cell">
-                            {task.dueDate
-                              ? new Date(
+                            {task.dueDate ? (
+                              new Date(
                                 task.dueDate,
                               ).toLocaleDateString(
                                 "en-GB",
@@ -285,7 +299,9 @@ export function ListView({
                                   year: "numeric",
                                 },
                               )
-                              : "No due date"}
+                            ) : (
+                              "No due date"
+                            )}
                           </td>
                         )}
 

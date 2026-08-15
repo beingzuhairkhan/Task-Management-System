@@ -23,19 +23,19 @@ export class TasksService {
   constructor(
     private readonly taskRepository: TaskRepository,
     private readonly activityService: ActivityService,
-      @InjectModel(Project.name) private projectModel: Model<Project>,
+    @InjectModel(Project.name) private projectModel: Model<Project>,
   ) { }
 
   async create(dto: CreateTaskDto, projectId: string, userId: string) {
     try {
-       const project = await this.projectModel
-      .findById(projectId)
-      .select('lead')
-      .lean();
+      const project = await this.projectModel
+        .findById(projectId)
+        .select('lead')
+        .lean();
 
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
+      if (!project) {
+        throw new NotFoundException('Project not found');
+      }
       const task = await this.taskRepository.create({
         ...dto,
         projectId: new Types.ObjectId(projectId),
@@ -48,7 +48,7 @@ export class TasksService {
         priority: dto.priority || TaskPriority.MEDIUM,
         dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-        lead:new Types.ObjectId(project.lead)
+        lead: new Types.ObjectId(project.lead)
       });
 
       await this.activityService.log({
@@ -64,41 +64,41 @@ export class TasksService {
   }
 
   async findAll(
-  projectId: string,
-  filterDto: FilterTaskDto,
-  dto: PaginationDto,
-  userId: string,
-): Promise<PaginatedResult<any>> {
-  const project = await this.projectModel
-  .findById(projectId)
-  .select('owner lead')
-  .lean();
+    projectId: string,
+    filterDto: FilterTaskDto,
+    dto: PaginationDto,
+    userId: string,
+  ): Promise<PaginatedResult<any>> {
+    const project = await this.projectModel
+      .findById(projectId)
+      .select('owner lead')
+      .lean();
 
-if (!project) {
-  throw new NotFoundException('Project not found');
-}
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
 
-const filter = this.taskRepository.buildFilter(
-  projectId,
-  filterDto,
-  dto.search,
-  userId,
-  project.owner,
-  project.lead,
-);
+    const filter = this.taskRepository.buildFilter(
+      projectId,
+      filterDto,
+      dto.search,
+      userId,
+      project.owner,
+      project.lead,
+    );
 
-  const sort = buildSortOption(dto.sort);
-  const page = dto.page || 1;
-  const limit = dto.limit || 20;
-  const skip = (page - 1) * limit;
+    const sort = buildSortOption(dto.sort);
+    const page = dto.page || 1;
+    const limit = dto.limit || 20;
+    const skip = (page - 1) * limit;
 
-  const [tasks, total] = await Promise.all([
-    this.taskRepository.findAll(filter, sort, skip, limit),
-    this.taskRepository.count(filter),
-  ]);
+    const [tasks, total] = await Promise.all([
+      this.taskRepository.findAll(filter, sort, skip, limit),
+      this.taskRepository.count(filter),
+    ]);
 
-  return paginateResult(tasks, total, dto);
-}
+    return paginateResult(tasks, total, dto);
+  }
   async findById(id: string) {
     const task = await this.taskRepository.findById(id);
     if (!task) throw new NotFoundException('Task', id);

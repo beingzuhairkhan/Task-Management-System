@@ -1,20 +1,16 @@
-
 "use client";
 
 import Link from "next/link";
-
 import {
   Plus,
   CalendarDays,
 } from "lucide-react";
+import { useParams } from "next/navigation";
 
-import {
-  groups,
-   TaskPriority,
-} from "@/lib/tasks-data";
-
+import { groups } from "@/lib/tasks-data";
 import { useTasks } from "@/lib/tasks-store";
-import { getAvatarOrInitials } from "@/lib/profile-store"
+import { getAvatarOrInitials } from "@/lib/profile-store";
+
 import {
   GroupDot,
   LabelChip,
@@ -24,72 +20,88 @@ import {
 
 import { TaskMenu } from "./task-menu";
 import type { TaskDialogState } from "./task-dialog";
-import { useParams } from "next/navigation";
-import {normalizeStatus} from "./task-dialog"
+import { normalizeStatus } from "./task-dialog";
 import { TasksBoardSkeleton } from "@/components/tasks/tasks-board-skeleton";
+
 type BoardViewProps = {
-  query: string;
   onDialog: (state: TaskDialogState) => void;
   fields: string[];
-  priorityFilter: TaskPriority | "All";
 };
 
 export function BoardView({
-  query,
   onDialog,
   fields,
-  priorityFilter,
 }: BoardViewProps) {
-  const { tasks: allTasks, loading } = useTasks();
-  const params = useParams<{ projectId: string }>();
+  const {
+    tasks: allTasks,
+    loading,
+  } = useTasks();
+
+  const params =
+    useParams<{ projectId: string }>();
 
   const projectId = params.projectId;
-  const q = query.trim().toLowerCase();
 
+  /*
+   * Check whether a field should be displayed.
+   */
   const show = (field: string) =>
     fields.includes(field);
 
+  /*
+   * Loading state
+   */
   if (loading) {
-  return <TasksBoardSkeleton />;
-}
+    return <TasksBoardSkeleton />;
+  }
+
   return (
     <div>
-
       {/* Board */}
-      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 p-6">
+      <div className="grid min-w-0 grid-cols-1 gap-3 p-6 md:grid-cols-2 xl:grid-cols-4">
         {groups.map((group) => {
-
+          /*
+           * Normalize group IDs because your backend
+           * may return values such as:
+           *
+           * TODO
+           * IN_PROGRESS
+           *
+           * while frontend groups may use:
+           *
+           * todo
+           * in-progress
+           */
           const normalizedGroupId = group.id
             .toUpperCase()
             .replace("-", "_");
 
-          const tasks = allTasks.filter((task: any) => {
-            const taskGroup = String(
-              task.group ?? task.groupId ?? "",
-            )
-              .toUpperCase()
-              .replace("-", "_");
+          /*
+           * IMPORTANT:
+           *
+           * Search, priority and status are NOT filtered here.
+           *
+           * They are already filtered on the server.
+           *
+           * The only filtering we do here is grouping
+           * tasks into the correct board column.
+           */
+          const tasks = allTasks.filter(
+            (task: any) => {
+              const taskGroup = String(
+                task.group ??
+                  task.groupId ??
+                  "",
+              )
+                .toUpperCase()
+                .replace("-", "_");
 
-            const matchesGroup =
-              taskGroup === normalizedGroupId;
-
-            const matchesQuery = q
-              ? String(task.title ?? "")
-                .toLowerCase()
-                .includes(q)
-              : true;
-
-            const matchesPriority =
-              priorityFilter === "All"
-                ? true
-                : task.priority === priorityFilter;
-
-            return (
-              matchesGroup &&
-              matchesQuery &&
-              matchesPriority
-            );
-          });
+              return (
+                taskGroup ===
+                normalizedGroupId
+              );
+            },
+          );
 
           return (
             <section
@@ -97,8 +109,10 @@ export function BoardView({
               className="min-w-0 rounded-xl border border-border bg-muted/30"
             >
               {/* Group Header */}
-              <div className="flex items-center gap-2  px-3 py-2.5">
-                <GroupDot tone={group.tone} />
+              <div className="flex items-center gap-2 px-3 py-2.5">
+                <GroupDot
+                  tone={group.tone}
+                />
 
                 <h2 className="text-sm font-semibold">
                   {group.name}
@@ -125,120 +139,183 @@ export function BoardView({
 
               {/* Tasks */}
               <div className="flex flex-col gap-2 px-2 pb-2 pt-2">
-                {tasks.map((task: any) => (
-                  <article
-                    key={task.id}
-                    className="group rounded-lg border border-border bg-card p-3 shadow-card transition-shadow hover:shadow-panel"
-                  >
-                    {/* Title + Menu */}
-                    <div className="flex items-start gap-2">
-                      <Link
-                      href={`/projects/${projectId}/tasks/${task.id}`}
-                        className="flex-1 text-sm font-medium leading-snug hover:underline"
-                      >
-                        {task.title}
-                      </Link>
+                {tasks.map(
+                  (task: any) => (
+                    <article
+                      key={task.id}
+                      className="group rounded-lg border border-border bg-card p-3 shadow-card transition-shadow hover:shadow-panel"
+                    >
+                      {/* Title + Menu */}
+                      <div className="flex items-start gap-2">
+                        <Link
+                          href={`/projects/${projectId}/tasks/${task.id}`}
+                          className="flex-1 text-sm font-medium leading-snug hover:underline"
+                        >
+                          {task.title}
+                        </Link>
 
-                      <TaskMenu
-                        task={task}
-                        onEdit={() =>
-                          onDialog({
-                            mode: "edit",
-                            task,
-                          })
-                        }
-                        className="opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-                      />
-                    </div>
-
-                    {/* Members + Due Date */}
-                    {(show("Members") || show("Due Date") || show("Reporter")) && (
-                      <div className="flex w-full items-center justify-between">
-                        {/* Left */}
-                        {show("Members") && (
-                          <div className="left-0">
-                            <MemberStack
-                              members={(task.members ?? []).map((member: any) => ({
-                                id: member.id,
-                                username: member.username,
-                                email: member.email,
-                                avatar: member.avatar,
-                              }))}
-                            />
-                          </div>
-                        )}
-
-                        {/* Right */}
-                        {(show("Reporter") || show("Due Date")) && (
-                          <div className="ml-auto flex items-center gap-2">
-                            {show("Reporter") && task.reporter && (
-                              <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-avatar-violet text-[10px] font-bold text-avatar-violet-foreground">
-                                {(() => {
-                                  const avatar = getAvatarOrInitials(
-                                    task.reporter.username,
-                                    task.reporter.avatar,
-                                  );
-
-                                  return task.reporter.avatar?.trim() ? (
-                                    <img
-                                      src={avatar}
-                                      alt={task.reporter.username}
-                                      className="size-full object-cover"
-                                    />
-                                  ) : (
-                                    avatar
-                                  );
-                                })()}
-                              </span>
-                            )}
-
-                            {show("Due Date") && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                                <CalendarDays className="size-3" />
-                                {task.dueDate
-                                  ? new Date(task.dueDate).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "short",
-                                  })
-                                  : "No due date"}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        <TaskMenu
+                          task={task}
+                          onEdit={() =>
+                            onDialog({
+                              mode: "edit",
+                              task,
+                            })
+                          }
+                          className="opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                        />
                       </div>
-                    )}
-                    {/* Priority + Status + Labels */}
-                    {(show("Priority") ||
-                      show("Labels") ||
-                      show("Status")) && (
+
+                      {/* Members + Due Date + Reporter */}
+                      {(show("Members") ||
+                        show("Due Date") ||
+                        show("Reporter")) && (
+                        <div className="flex w-full items-center justify-between">
+                          {/* Members */}
+                          {show("Members") && (
+                            <div className="left-0">
+                              <MemberStack
+                                members={(
+                                  task.members ??
+                                  []
+                                ).map(
+                                  (
+                                    member: any,
+                                  ) => ({
+                                    id: member.id,
+                                    username:
+                                      member.username,
+                                    email:
+                                      member.email,
+                                    avatar:
+                                      member.avatar,
+                                  }),
+                                )}
+                              />
+                            </div>
+                          )}
+
+                          {/* Reporter + Due Date */}
+                          {(show("Reporter") ||
+                            show("Due Date")) && (
+                            <div className="ml-auto flex items-center gap-2">
+                              {/* Reporter */}
+                              {show(
+                                "Reporter",
+                              ) &&
+                                task.reporter && (
+                                  <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-avatar-violet text-[10px] font-bold text-avatar-violet-foreground">
+                                    {(() => {
+                                      const avatar =
+                                        getAvatarOrInitials(
+                                          task
+                                            .reporter
+                                            .username,
+                                          task
+                                            .reporter
+                                            .avatar,
+                                        );
+
+                                      return task.reporter.avatar?.trim() ? (
+                                        <img
+                                          src={
+                                            avatar
+                                          }
+                                          alt={
+                                            task
+                                              .reporter
+                                              .username
+                                          }
+                                          className="size-full object-cover"
+                                        />
+                                      ) : (
+                                        avatar
+                                      );
+                                    })()}
+                                  </span>
+                                )}
+
+                              {/* Due Date */}
+                              {show(
+                                "Due Date",
+                              ) && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                  <CalendarDays className="size-3" />
+
+                                  {task.dueDate
+                                    ? new Date(
+                                        task.dueDate,
+                                      ).toLocaleDateString(
+                                        "en-GB",
+                                        {
+                                          day: "2-digit",
+                                          month: "short",
+                                        },
+                                      )
+                                    : "No due date"}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Priority + Status + Labels */}
+                      {(show("Priority") ||
+                        show("Labels") ||
+                        show("Status")) && (
                         <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-border pt-2.5">
-                          {show("Priority") && (
+                          {/* Priority */}
+                          {show(
+                            "Priority",
+                          ) && (
                             <PriorityTag
-                            priority={task.priority.replace(/_/g, " ")}
+                              priority={String(
+                                task.priority ??
+                                  "",
+                              ).replace(
+                                /_/g,
+                                " ",
+                              )}
                             />
                           )}
 
-                          {show("Status") && (
-                            <LabelChip status={normalizeStatus(task.status)}>
-  {task.status}
-</LabelChip>
+                          {/* Status */}
+                          {show(
+                            "Status",
+                          ) && (
+                            <LabelChip
+                              status={normalizeStatus(
+                                task.status,
+                              )}
+                            >
+                              {task.status}
+                            </LabelChip>
                           )}
 
-                          {show("Labels") &&
-                            (task.labels ?? [])
+                          {/* Labels */}
+                          {show(
+                            "Labels",
+                          ) &&
+                            (
+                              task.labels ??
+                              []
+                            )
                               .slice(0, 3)
                               .map(
-                                (label: any) => (
+                                (
+                                  label: any,
+                                ) => (
                                   <LabelChip
                                     key={
                                       typeof label ===
-                                        "string"
+                                      "string"
                                         ? label
                                         : label.id
                                     }
                                   >
                                     {typeof label ===
-                                      "string"
+                                    "string"
                                       ? label
                                       : label.name}
                                   </LabelChip>
@@ -246,8 +323,9 @@ export function BoardView({
                               )}
                         </div>
                       )}
-                  </article>
-                ))}
+                    </article>
+                  ),
+                )}
 
                 {/* Add Task */}
                 <button
@@ -271,5 +349,3 @@ export function BoardView({
     </div>
   );
 }
-
-

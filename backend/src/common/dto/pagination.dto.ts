@@ -11,9 +11,12 @@ import {
 import {
   ProjectPriority,
   ProjectStatus,
+  TaskStatus
 } from '../../common/enums';
 
 export class PaginationDto {
+
+  
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()
   @Type(() => Number)
@@ -52,11 +55,11 @@ export class PaginationDto {
   priority?: ProjectPriority;
 
   @ApiPropertyOptional({
-    enum: ProjectStatus,
+    enum: TaskStatus,
   })
   @IsOptional()
-  @IsEnum(ProjectStatus)
-  status?: ProjectStatus;
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 }
 
 export interface PaginatedResult<T> {

@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsMongoId,
   IsOptional,
+  IsString
 } from 'class-validator';
 
 import {
@@ -13,6 +14,14 @@ import {
 } from '../../common/enums';
 
 export class FilterTaskDto {
+
+   @ApiPropertyOptional({
+    description: 'Search by project title or description',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
   @ApiPropertyOptional({
     enum: TaskStatus,
   })

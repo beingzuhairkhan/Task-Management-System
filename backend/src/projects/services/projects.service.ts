@@ -73,73 +73,7 @@ export class ProjectsService {
     }
   }
 
-  // async findAll(
-  //   dto: PaginationDto,
-  //   userId: string,
-  // ): Promise<PaginatedResult<any>> {
-  //   try {
 
-
-  //     const userObjectId = new Types.ObjectId(userId);
-
-  //     const baseFilter = {
-  //       $or: [
-  //         { owner: userObjectId },
-  //         { lead: userObjectId },
-  //       ],
-  //     };
-
-  //     const searchFilter = buildSearchFilter(
-  //       dto.search,
-  //       ['title', 'description'],
-  //     );
-
-  //     const filters: any[] = [baseFilter];
-
-  //     // Search
-  //     if (searchFilter.$or) {
-  //       filters.push(searchFilter);
-  //     }
-
-  //     // Priority
-  //     if (dto.priority) {
-  //       filters.push({
-  //         priority: dto.priority,
-  //       });
-  //     }
-
-  //     // Status
-  //     if (dto.status) {
-  //       filters.push({
-  //         status: dto.status,
-  //       });
-  //     }
-  //     const filter =
-  //       filters.length === 1
-  //         ? baseFilter
-  //         : { $and: filters };
-
-  //     const sort = buildSortOption(dto.sort);
-
-  //     const page = dto.page || 1;
-  //     const limit = dto.limit || 20;
-  //     const skip = (page - 1) * limit;
-
-  //     const [projects, total] = await Promise.all([
-  //       this.projectRepository.findAll(
-  //         filter,
-  //         sort,
-  //         skip,
-  //         limit,
-  //       ),
-  //       this.projectRepository.count(filter),
-  //     ]);
-
-  //     return paginateResult(projects, total, dto);
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // }
   async findAll(
   dto: PaginationDto,
   userId: string,

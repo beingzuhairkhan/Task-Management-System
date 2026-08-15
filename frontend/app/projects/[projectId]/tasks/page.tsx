@@ -16,7 +16,7 @@ import {
   type TaskDialogState,
 } from "@/components/tasks/task-dialog";
 
-import  { TaskPriority } from "@/lib/tasks-data";
+import { useTasks } from "@/lib/tasks-store";
 
 export default function DashboardPage() {
   const [view, setView] =
@@ -24,9 +24,6 @@ export default function DashboardPage() {
 
   const [sidebarOpen, setSidebarOpen] =
     useState(true);
-
-  const [query, setQuery] =
-    useState("");
 
   const [dialog, setDialog] =
     useState<TaskDialogState | null>(null);
@@ -38,14 +35,22 @@ export default function DashboardPage() {
     "Labels",
   ]);
 
-  const [priorityFilter, setPriorityFilter] =
-    useState<TaskPriority | "All">("All");
+  const {
+    search,
+    setSearch,
+    priorityFilter,
+    setPriorityFilter,
+    statusFilter,
+    setStatusFilter,
+  } = useTasks();
 
   const toggleField = (field: string) => {
     setFields((previous) =>
       previous.includes(field)
-        ? previous.filter((item) => item !== field)
-        : [...previous, field]
+        ? previous.filter(
+            (item) => item !== field,
+          )
+        : [...previous, field],
     );
   };
 
@@ -57,51 +62,55 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background ">
-      {/* Sidebar */}
+    <div className="flex min-h-screen bg-background">
       <AppSidebar
         open={sidebarOpen}
         active="tasks"
       />
 
-      {/* Main Content */}
       <main className="min-w-0 flex-1">
-        {/* Toolbar */}
         <Toolbar
           view={view}
           onViewChange={setView}
           onToggleSidebar={() =>
-            setSidebarOpen((open) => !open)
+            setSidebarOpen(
+              (open) => !open,
+            )
           }
-          query={query}
-          onQueryChange={setQuery}
+
+          query={search}
+          onQueryChange={setSearch}
+
           onAddTask={handleAddTask}
+
           fields={fields}
           onToggleField={toggleField}
-          priorityFilter={priorityFilter}
+
+          priorityFilter={
+            priorityFilter
+          }
           onPriorityFilterChange={
             setPriorityFilter
           }
+
+          statusFilter={statusFilter}
+          onStatusFilterChange={
+            setStatusFilter
+          }
         />
 
-        {/* Board / List */}
         {view === "board" ? (
           <BoardView
-            query={query}
             onDialog={setDialog}
             fields={fields}
-            priorityFilter={priorityFilter}
           />
         ) : (
           <ListView
-            query={query}
             onDialog={setDialog}
             fields={fields}
-            priorityFilter={priorityFilter}
           />
         )}
 
-        {/* Task Dialog */}
         <TaskDialog
           state={dialog}
           onOpenChange={(open) => {

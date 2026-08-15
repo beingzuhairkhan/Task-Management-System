@@ -18,6 +18,14 @@ class FilterTaskDto {
 exports.FilterTaskDto = FilterTaskDto;
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
+        description: 'Search by project title or description',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], FilterTaskDto.prototype, "search", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
         enum: enums_1.TaskStatus,
     }),
     (0, class_validator_1.IsOptional)(),

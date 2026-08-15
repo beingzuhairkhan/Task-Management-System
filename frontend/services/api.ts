@@ -1,5 +1,6 @@
 
 import { ProjectStatus } from "@/lib/projects-store";
+import { TaskStatus } from "@/lib/tasks-data";
 import axios from "axios";
 import type {
   AxiosRequestConfig,
@@ -301,8 +302,14 @@ export const taskAPI = {
     return authAPI.post(`/projects/${projectId}/tasks`, data);
   },
 
-  getTaskByProjectId: (projectId: string) => {
-    return authAPI.get(`/projects/${projectId}/tasks`);
+  getTaskByProjectId: (projectId: string,params?: {
+    search?: string;
+    priority?: TaskPriority;
+    status?: TaskStatus;
+  },) => {
+    return authAPI.get(`/projects/${projectId}/tasks`,{
+      params,
+    },);
   },
 
   moveTask: (
