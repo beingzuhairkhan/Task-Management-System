@@ -126,9 +126,8 @@ export function TasksProvider({
         .toUpperCase()
         .replace(/\s+/g, "_") as TaskStatus;
     }
-      }
+      
 
-      console.log("Fetching tasks with params:", params);
 
       const response =
         await taskAPI.getTaskByProjectId(
