@@ -51,10 +51,10 @@ import {
     groups,
     priorities,
     statusOptions,
-     TaskPriority,
+    TaskPriority,
 } from "@/lib/tasks-data";
 
-import {TaskDetailsSkeleton} from "@/components/tasks/TaskDetailsSkeleton"
+import { TaskDetailsSkeleton } from "@/components/tasks/TaskDetailsSkeleton"
 
 import { SubtasksSection } from "@/components/tasks/SubtasksSection";
 
@@ -417,14 +417,14 @@ export default function TaskDetailPage() {
             };
         }
         else if (
-    task.dueDate !== previousTask.dueDate
-) {
-    payload = {
-        dueDate: task.dueDate
-            ? new Date(task.dueDate).toISOString()
-            : null,
-    };
-}
+            task.dueDate !== previousTask.dueDate
+        ) {
+            payload = {
+                dueDate: task.dueDate
+                    ? new Date(task.dueDate).toISOString()
+                    : null,
+            };
+        }
 
         else {
             const currentMemberIds =
@@ -503,13 +503,13 @@ export default function TaskDetailPage() {
             }
         }
 
-        
+
         if (!payload) {
             previousTaskRef.current = task;
             return;
         }
 
-       
+
         if (updatingRef.current) {
             return;
         }
@@ -518,14 +518,14 @@ export default function TaskDetailPage() {
             try {
                 updatingRef.current = true;
 
-      
+
                 await taskAPI.updateTaskById(
                     projectId,
                     taskId,
                     payload,
                 );
 
-               
+
                 previousTaskRef.current = task;
 
                 toast.success(
@@ -616,7 +616,7 @@ export default function TaskDetailPage() {
                 ...task.members,
                 {
                     id: member.id,
-                    username: member.username ,
+                    username: member.username,
                     avatar: member.avatar,
                     email: member.email,
                 },
@@ -814,8 +814,8 @@ export default function TaskDetailPage() {
 
 
     if (loading) {
-    return <TaskDetailsSkeleton />;
-}
+        return <TaskDetailsSkeleton />;
+    }
 
     if (!task) {
         return (
@@ -888,7 +888,7 @@ export default function TaskDetailPage() {
 
                     <div className="ml-auto flex items-center gap-1 text-muted-foreground">
 
-                       
+
                         <button
                             type="button"
                             aria-label="Share"
@@ -898,7 +898,7 @@ export default function TaskDetailPage() {
                             <Share2 className="size-4" />
                         </button>
 
-                    
+
 
                     </div>
                 </div>
@@ -1359,7 +1359,7 @@ export default function TaskDetailPage() {
                                                 align="start"
                                                 className="w-40"
                                             >
-{/* 
+                                                {/* 
                                                 <DropdownMenuLabel className="text-xs text-muted-foreground">
                                                     Priority
                                                 </DropdownMenuLabel> */}
@@ -1490,7 +1490,7 @@ export default function TaskDetailPage() {
                                                             : undefined
                                                     }
 
-                                                   
+
                                                     onSelect={(
                                                         date,
                                                     ) => {

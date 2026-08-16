@@ -280,7 +280,7 @@ export const userAPI = {
 
 
 export const labelAPI = {
-  createLabel: (data: string) => {
+  createLabel: (data: { name: string }) => {
     return authAPI.post("/labels", data);
   },
 

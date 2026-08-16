@@ -6,13 +6,6 @@ import { Document, Types } from 'mongoose';
   versionKey: false,
 })
 export class Label extends Document {
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'Project',
-    required: true,
-    index: true,
-  })
-  projectId: Types.ObjectId;
 
   @Prop({
     required: true,

@@ -12,7 +12,11 @@ export class LabelsService {
   ) {}
 
   async create(dto: CreateLabelDto) {
+    try{
     return this.labelRepository.create(dto);
+    }catch(err){
+      throw err ;
+    }
   }
 
   async findAll() {

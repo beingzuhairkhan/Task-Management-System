@@ -17,15 +17,6 @@ let Label = class Label extends mongoose_2.Document {
 exports.Label = Label;
 __decorate([
     (0, mongoose_1.Prop)({
-        type: mongoose_2.Types.ObjectId,
-        ref: 'Project',
-        required: true,
-        index: true,
-    }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], Label.prototype, "projectId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
         required: true,
         trim: true,
     }),

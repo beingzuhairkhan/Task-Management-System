@@ -156,8 +156,8 @@ export function ProjectsProvider({
                         "",
 
                     priority:
-                     input.priority ??
-                      TaskPriority.MEDIUM,
+                        input.priority ??
+                        TaskPriority.MEDIUM,
 
                     status:
                         input.status ??
@@ -195,9 +195,9 @@ export function ProjectsProvider({
                             (project) =>
                                 project.id === id
                                     ? {
-                                          ...project,
-                                          ...patch,
-                                      }
+                                        ...project,
+                                        ...patch,
+                                    }
                                     : project
                         )
                 );
@@ -205,12 +205,12 @@ export function ProjectsProvider({
 
 
             deleteProject: async (id: string) => {
-      await projectAPI.deleteProjectById(id);
+                await projectAPI.deleteProjectById(id);
 
-      setProjects((prev) =>
-        prev.filter((project) => project.id !== id)
-      );
-    },
+                setProjects((prev) =>
+                    prev.filter((project) => project.id !== id)
+                );
+            },
         }),
         [projects]
     );

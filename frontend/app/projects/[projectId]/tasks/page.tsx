@@ -42,6 +42,7 @@ export default function DashboardPage() {
     setPriorityFilter,
     statusFilter,
     setStatusFilter,
+    fetchTasks
   } = useTasks();
 
   const toggleField = (field: string) => {
@@ -118,6 +119,7 @@ export default function DashboardPage() {
               setDialog(null);
             }
           }}
+          onSuccess={fetchTasks}
         />
       </main>
     </div>

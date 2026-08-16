@@ -18,7 +18,12 @@ let LabelsService = class LabelsService {
         this.labelRepository = labelRepository;
     }
     async create(dto) {
-        return this.labelRepository.create(dto);
+        try {
+            return this.labelRepository.create(dto);
+        }
+        catch (err) {
+            throw err;
+        }
     }
     async findAll() {
         return this.labelRepository.findAll();

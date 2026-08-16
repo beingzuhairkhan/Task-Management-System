@@ -10,9 +10,30 @@ export class LabelRepository {
   constructor(@InjectModel(Label.name) private labelModel: Model<Label>) {}
 
   async create(data: Partial<Label>): Promise<Label> {
-    const created = new this.labelModel(data);
-    return created.save();
+  const name = data.name?.trim();
+
+  if (!name) {
+    throw new Error("Label name is required");
   }
+
+  const existing = await this.labelModel.findOne({
+    name: {
+      $regex: `^${name}$`,
+      $options: "i",
+    },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
+  const created = new this.labelModel({
+    ...data,
+    name,
+  });
+
+  return created.save();
+}
 
   async findAll():Promise<Label[]>{
     return this.labelModel.find().sort({ name: 1 }).exec();

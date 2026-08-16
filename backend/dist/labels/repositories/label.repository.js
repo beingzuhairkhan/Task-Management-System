@@ -22,7 +22,23 @@ let LabelRepository = class LabelRepository {
         this.labelModel = labelModel;
     }
     async create(data) {
-        const created = new this.labelModel(data);
+        const name = data.name?.trim();
+        if (!name) {
+            throw new Error("Label name is required");
+        }
+        const existing = await this.labelModel.findOne({
+            name: {
+                $regex: `^${name}$`,
+                $options: "i",
+            },
+        });
+        if (existing) {
+            return existing;
+        }
+        const created = new this.labelModel({
+            ...data,
+            name,
+        });
         return created.save();
     }
     async findAll() {

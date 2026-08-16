@@ -67,9 +67,6 @@ export function TasksProvider({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // --------------------------------------------------
-  // Filters
-  // --------------------------------------------------
 
   const [search, setSearch] = useState("");
 
@@ -79,9 +76,6 @@ export function TasksProvider({
   const [statusFilter, setStatusFilter] =
     useState<TaskStatus | "All">("All");
 
-  // --------------------------------------------------
-  // Debounced search
-  // --------------------------------------------------
 
   const [debouncedSearch, setDebouncedSearch] =
     useState("");
@@ -295,7 +289,7 @@ export function TasksProvider({
             task.id === taskId
               ? {
                   ...task,
-                  groupId,
+                  group: groupId,
                 }
               : task,
           ),

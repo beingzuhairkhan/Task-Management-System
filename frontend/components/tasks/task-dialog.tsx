@@ -53,35 +53,37 @@ interface LabelOption {
   name: string;
 }
 
-  export const normalizeStatus = (
-    value?: string
-  ): TaskStatus => {
-    switch (value?.toUpperCase()) {
-      case "BACKLOG":
-        return TaskStatus.BACKLOG;
+export const normalizeStatus = (
+  value?: string
+): TaskStatus => {
+  switch (value?.toUpperCase()) {
+    case "BACKLOG":
+      return TaskStatus.BACKLOG;
 
-      case "IN_PROGRESS":
-      case "IN PROGRESS":
-        return TaskStatus.IN_PROGRESS;
+    case "IN_PROGRESS":
+    case "IN PROGRESS":
+      return TaskStatus.IN_PROGRESS;
 
-      case "BLOCKED":
-        return TaskStatus.BLOCKED;
+    case "BLOCKED":
+      return TaskStatus.BLOCKED;
 
-      case "DONE":
-        return TaskStatus.DONE;
+    case "DONE":
+      return TaskStatus.DONE;
 
-      case "PLANNED":
-      default:
-        return TaskStatus.PLANNED;
-    }
-  };
+    case "PLANNED":
+    default:
+      return TaskStatus.PLANNED;
+  }
+};
 
 export function TaskDialog({
   state,
   onOpenChange,
+  onSuccess,
 }: {
   state: TaskDialogState | null;
   onOpenChange: (open: boolean) => void;
+   onSuccess?: () => void | Promise<void>;
 }) {
   // const { updateTask } = useTasks();
 
@@ -112,6 +114,8 @@ export function TaskDialog({
   const [availableMembers, setAvailableMembers] = useState<User[]>([]);
   const [labelOptions, setLabelOptions] = useState<LabelOption[]>([]);
 
+  const [newLabelName, setNewLabelName] = useState("");
+  const [isAddingLabel, setIsAddingLabel] = useState(false);
   const params = useParams();
 
   const projectId = params.projectId as string;
@@ -307,7 +311,7 @@ export function TaskDialog({
         toast.success("Task created successfully");
       }
 
-
+       await onSuccess?.();
       onOpenChange(false);
     } catch (error) {
       console.error(
@@ -328,6 +332,52 @@ export function TaskDialog({
       },
     )
     : "";
+
+  const createLabel = async () => {
+    const name = newLabelName.trim();
+
+    if (!name) {
+      return;
+    }
+
+    // Prevent duplicate on frontend, case-insensitive
+    const alreadyExists = labelOptions.some(
+      (label) => label.name.trim().toLowerCase() === name.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      toast.error("Label already exists");
+      return;
+    }
+
+    try {
+      const response = await labelAPI.createLabel({
+        name,
+      });
+
+      const createdLabel =
+        response.data?.data ?? response.data;
+
+      const newLabel: LabelOption = {
+        id: createdLabel.id ?? createdLabel._id,
+        name: createdLabel.name,
+      };
+
+      // Immediately update label list
+      setLabelOptions((prev) => [...prev, newLabel]);
+
+      // Immediately select the newly created label
+      setLabels((prev) => [...prev, newLabel.id]);
+
+      setNewLabelName("");
+      setIsAddingLabel(false);
+
+      toast.success("Label created successfully");
+    } catch (error) {
+      console.error("Failed to create label:", error);
+      toast.error("Failed to create label");
+    }
+  };
 
   return (
     <Dialog
@@ -625,9 +675,7 @@ export function TaskDialog({
 
           {/* Labels */}
           <div className="grid gap-1.5">
-            <Label>
-              Labels
-            </Label>
+            <Label>Labels</Label>
 
             <div className="flex flex-wrap gap-1.5">
               {labelOptions.map((label) => (
@@ -643,7 +691,10 @@ export function TaskDialog({
                   }
                   className={cn(
                     "rounded-md border border-border px-2 py-1 text-xs font-medium transition-colors",
-                    labels.includes(label.name)
+                    labels.some(
+                      (item) =>
+                        item.toLowerCase() === label.name.toLowerCase()
+                    )
                       ? "border-primary bg-primary/10 text-primary"
                       : "text-muted-foreground hover:bg-muted",
                   )}
@@ -651,7 +702,63 @@ export function TaskDialog({
                   {label.name}
                 </button>
               ))}
+
+              {/* Add Label Button */}
+              <button
+                type="button"
+                onClick={() => setIsAddingLabel(true)}
+                className="inline-flex items-center justify-center rounded-md border border-dashed border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <span className="mr-1 text-base leading-none">+</span>
+                Add label
+              </button>
             </div>
+
+            {isAddingLabel && (
+              <div className="mt-2 flex items-center gap-2">
+                <Input
+                  autoFocus
+                  value={newLabelName}
+                  onChange={(e) => setNewLabelName(e.target.value)}
+                  placeholder="Label name"
+                  className="h-8 max-w-[200px]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      createLabel();
+                    }
+
+                    if (e.key === "Escape") {
+                      setNewLabelName("");
+                      setIsAddingLabel(false);
+                    }
+                  }}
+                />
+
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8"
+                  onClick={createLabel}
+                  disabled={!newLabelName.trim()}
+                >
+                  Add
+                </Button>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-8"
+                  onClick={() => {
+                    setNewLabelName("");
+                    setIsAddingLabel(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
