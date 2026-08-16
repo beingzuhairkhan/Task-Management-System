@@ -13,9 +13,6 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const enter = () => {
-    router.push("/projects");
-  };
 
   const loginWithGoogle = () => {
     window.location.href = `${API_URL}/api/auth/google`;
@@ -51,12 +48,6 @@ function LoginContent() {
         </p>
 
         <div className="mt-5 space-y-2.5">
-          <Button
-            className="w-full rounded-full"
-            onClick={enter}
-          >
-            Continue as Guest
-          </Button>
 
           <Button
             variant="outline"
@@ -69,17 +60,6 @@ function LoginContent() {
         </div>
       </div>
 
-      <p className="mt-5 max-w-xs text-center text-xs text-muted-foreground">
-        By clicking continue, you agree to our{" "}
-        <a href="/terms" className="underline">
-          Terms of Service
-        </a>{" "}
-        and{" "}
-        <a href="/privacy" className="underline">
-          Privacy Policy
-        </a>
-        .
-      </p>
     </main>
   );
 }
