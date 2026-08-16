@@ -929,10 +929,9 @@ export default function TaskDetailPage() {
                                 {task.title}
                             </h1>
 
-                            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                                {task.description ||
-                                    "No description yet."}
-                            </p>
+                           <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-justify text-muted-foreground">
+  {task.description || "No description yet."}
+</p>
                         </header>
 
 
