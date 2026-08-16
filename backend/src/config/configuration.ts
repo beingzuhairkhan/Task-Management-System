@@ -72,5 +72,5 @@ export const config = () => ({
       '',
   },
   redis:process.env.REDIS_URL ,
-  RESEND_KEY:process.env.RESEND_API_KEY
+  BREVO_KEY:process.env.BREVO_API_KEY
 });

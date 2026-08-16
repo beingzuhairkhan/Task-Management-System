@@ -12,7 +12,7 @@ import {
 } from '../../common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-
+import { BrevoClient } from '@getbrevo/brevo';
 @Injectable()
 export class UsersService {
   private readonly transporter: nodemailer.Transporter;
@@ -21,22 +21,9 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
   ) {
-    this.transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-
-      auth: {
-        // user: this.configService.get<string>("mail.user"),
-        // pass: this.configService.get<string>("mail.password"),
-        user: 'zuhairkhan7890o@gmail.com',
-        pass: 'vyvc hrzb iwxl kghv',
-      },
-
-      connectionTimeout: 30000,
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-    });
+    this.brevo = new BrevoClient({
+      apiKey: this.configService.get<string>('BREVO_KEY')!,
+    })
   }
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {
@@ -72,94 +59,113 @@ export class UsersService {
   }
 
   async invite(dto: InviteUserDto) {
-    const email = dto.email.trim()
+  const email = dto.email.trim();
 
-    const existingUser =
-      await this.userRepository.findByEmail(email);
+  const existingUser =
+    await this.userRepository.findByEmail(email);
 
+  if (existingUser) {
+    throw new ConflictException(
+      'User with this email already exists',
+    );
+  }
 
-    if (existingUser) {
+  const frontendUrl =
+    this.configService.get<string>('clientUrl');
 
-      throw new ConflictException(
-        'User with this email already exists',
-      );
-    }
+  const inviteUrl = frontendUrl;
 
-    const frontendUrl = this.configService.get<string>('clientUrl');
+  try {
+    const result =
+      await this.brevo.transactionalEmails.sendTransacEmail({
+        sender: {
+          name: 'Task Management Dexter',
 
-    const inviteUrl = `${frontendUrl}`;
+          email:
+            this.configService.get<string>(
+              'mail.user',
+            )!,
+        },
 
+        to: [
+          {
+            email,
+          },
+        ],
 
-    try {
-      const result = await this.transporter.sendMail({
-        from: this.configService.get<string>("mail.from"),
-        to: email,
-        subject: "You have been invited in Task Management System",
-        html: `
-      <!DOCTYPE html>
-      <html>
-        <body
-          style="
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 40px;
-          "
-        >
-          <div
-            style="
-              max-width: 600px;
-              margin: auto;
-              background: white;
-              padding: 30px;
-              border-radius: 10px;
-            "
-          >
-            <h2>You have been invited!</h2>
+        subject:
+          'You have been invited to Task Management System',
 
-            <p>
-              You have received an invitation
-              to join our platform.
-            </p>
-
-            <p>
-              Click the button below to accept
-              the invitation.
-            </p>
-
-            <a
-              href="${inviteUrl}"
+        htmlContent: `
+          <!DOCTYPE html>
+          <html>
+            <body
               style="
-                display: inline-block;
-                padding: 12px 24px;
-                background: #2563eb;
-                color: white;
-                text-decoration: none;
-                border-radius: 6px;
-                margin: 20px 0;
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+                padding: 40px;
               "
             >
-              Accept Invitation
-            </a>
-          </div>
-        </body>
-      </html>
-    `,
+              <div
+                style="
+                  max-width: 600px;
+                  margin: auto;
+                  background: white;
+                  padding: 30px;
+                  border-radius: 10px;
+                "
+              >
+                <h2>You have been invited!</h2>
+
+                <p>
+                  You have received an invitation
+                  to join our platform.
+                </p>
+
+                <p>
+                  Click the button below to accept
+                  the invitation.
+                </p>
+
+                <a
+                  href="${inviteUrl}"
+                  style="
+                    display: inline-block;
+                    padding: 12px 24px;
+                    background: #2563eb;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                  "
+                >
+                  Accept Invitation
+                </a>
+              </div>
+            </body>
+          </html>
+        `,
       });
 
-      this.logger.log(`Email sent: ${result.messageId}`);
-    } catch (error) {
-      this.logger.error(
-        "Failed to send invitation email",
-        error instanceof Error ? error.stack : String(error),
-      );
+    this.logger.log(
+      `Invitation email sent: ${result.messageId}`,
+    );
 
-      throw new InternalServerErrorException(
-        "Failed to send invitation email",
-      );
-    }
     return {
       message: 'Invitation sent successfully',
       email,
     };
+  } catch (error) {
+    this.logger.error(
+      'Failed to send invitation email',
+      error instanceof Error
+        ? error.stack
+        : String(error),
+    );
+
+    throw new InternalServerErrorException(
+      'Failed to send invitation email',
+    );
   }
+}
 }
