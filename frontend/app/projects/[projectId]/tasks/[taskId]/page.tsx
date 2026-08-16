@@ -19,6 +19,7 @@ import {
     Trash2,
     Paperclip,
     Pencil,
+    PanelLeft
 } from "lucide-react";
 
 import {
@@ -246,6 +247,8 @@ export default function TaskDetailPage() {
     const [members, setMembers] = useState<any[]>([]);
     const [userActivity, setUserActivity] = useState<any[]>([]);
 
+      const [sidebarOpen, setSidebarOpen] =
+    useState(true);
 
     const previousTaskRef = useRef<Task | null>(null);
 
@@ -842,7 +845,7 @@ export default function TaskDetailPage() {
 
             {/* Sidebar */}
             <AppSidebar
-                open
+                open={sidebarOpen}
                 active="tasks"
             />
 
@@ -854,7 +857,13 @@ export default function TaskDetailPage() {
 
 
                 <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-background px-4 py-2.5 md:px-6">
-
+                   <button
+                                 onClick={() => setSidebarOpen((o) => !o)}
+                                 aria-label="Toggle sidebar"
+                                 className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                               >
+                                 <PanelLeft className="size-4" />
+                               </button>
                     <Link
                         href={`/projects/${projectId}/tasks`}
                         aria-label="Back to tasks"
