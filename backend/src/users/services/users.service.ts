@@ -27,8 +27,10 @@ export class UsersService {
       secure: true,
 
       auth: {
-        user: this.configService.get<string>("mail.user"),
-        pass: this.configService.get<string>("mail.password"),
+        // user: this.configService.get<string>("mail.user"),
+        // pass: this.configService.get<string>("mail.password"),
+        user: 'zuhairkhan7890o@gmail.com',
+        pass: 'vyvc hrzb iwxl kghv',
       },
 
       connectionTimeout: 30000,
