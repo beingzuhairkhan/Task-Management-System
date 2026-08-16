@@ -17,6 +17,7 @@ const project_middleware_1 = require("./middleware/project.middleware");
 const users_module_1 = require("../users/users.module");
 const subtask_schema_1 = require("../subtasks/schemas/subtask.schema");
 const task_schema_1 = require("../tasks/schemas/task.schema");
+const config_1 = require("@nestjs/config");
 let ProjectsModule = class ProjectsModule {
 };
 exports.ProjectsModule = ProjectsModule;
@@ -32,7 +33,10 @@ exports.ProjectsModule = ProjectsModule = __decorate([
                     schema: subtask_schema_1.SubtaskSchema,
                 },
             ]),
-            users_module_1.UsersModule
+            users_module_1.UsersModule,
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
         ],
         controllers: [projects_controller_1.ProjectsController],
         providers: [projects_service_1.ProjectsService, project_repository_1.ProjectRepository, project_middleware_1.ProjectMiddleware],

@@ -253,6 +253,15 @@ export const projectAPI = {
     );
   },
 
+  generateDescription: (
+    title: string
+  ): Promise<AxiosResponse<{ description: string }>> => {
+    return authAPI.post(
+      "/projects/generate-description",
+      { title }
+    );
+  },
+
 
 };
 

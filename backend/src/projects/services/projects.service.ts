@@ -4,8 +4,7 @@ import { ProjectRepository } from '../repositories/project.repository';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
-import { InviteMemberDto } from '../dto/invite-member.dto';
-import { UpdateMemberRoleDto } from '../dto/update-member-role.dto';
+import Groq from 'groq-sdk';
 import {
   NotFoundException,
   ForbiddenException,
@@ -21,17 +20,26 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Subtask, } from 'src/subtasks/schemas/subtask.schema';
 import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
+    private readonly groq: Groq;
   constructor(
     private readonly projectRepository: ProjectRepository,
     private readonly userRepository: UserRepository,
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
        @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
-    @InjectModel(Task.name) private taskModel: Model<Task>
-  ) { }
+       @InjectModel(Task.name) private taskModel: Model<Task>,
+         private readonly configService: ConfigService,
+  ) { 
+    this.groq = new Groq({
+      apiKey: this.configService.get<string>(
+        'GROQ_API_KEY',
+      ),
+    });
+  }
 
   async create(dto: CreateProjectDto, userId: string) {
     try {
@@ -261,53 +269,6 @@ export class ProjectsService {
     }
   }
 
-  // async inviteMember(projectId: string, dto: InviteMemberDto) {
-  //   const project = await this.projectRepository.findById(projectId);
-  //   if (!project) throw new NotFoundException('Project', projectId);
-
-  //   const alreadyMember = project.members.some(
-  //     (m) => String(m.user) === String(dto.userId),
-  //   );
-  //   if (alreadyMember) {
-  //     throw new ConflictException('User is already a member of this project');
-  //   }
-
-  //   return this.projectRepository.addMember(projectId, dto.userId, dto.role);
-  // }
-
-  // async updateMemberRole(projectId: string, userId: string, dto: UpdateMemberRoleDto) {
-  //   const project = await this.projectRepository.findById(projectId);
-  //   if (!project) throw new NotFoundException('Project', projectId);
-
-  //   const member = project.members.find((m) => String(m.user) === String(userId));
-  //   if (!member) {
-  //     throw new NotFoundException('Member', userId);
-  //   }
-  //   if (member.role === ProjectRole.OWNER) {
-  //     throw new ForbiddenException('Cannot change the role of the project owner');
-  //   }
-
-  //   const updated = await this.projectRepository.updateMemberRole(
-  //     projectId,
-  //     userId,
-  //     dto.role,
-  //   );
-  //   return updated;
-  // }
-
-  // async removeMember(projectId: string, userId: string) {
-  //   const project = await this.projectRepository.findById(projectId);
-  //   if (!project) throw new NotFoundException('Project', projectId);
-
-  //   const member = project.members.find((m) => String(m.user) === String(userId));
-  //   if (!member) throw new NotFoundException('Member', userId);
-  //   if (member.role === ProjectRole.OWNER) {
-  //     throw new ForbiddenException('Cannot remove the project owner');
-  //   }
-
-  //   return this.projectRepository.removeMember(projectId, userId);
-  // }
-
   async getUserRole(projectId: string, userId: string): Promise<ProjectRole | null> {
     const project = await this.projectRepository.findByIdLean(projectId);
     if (!project) return null;
@@ -317,4 +278,44 @@ export class ProjectsService {
     );
     return member ? (member.role as ProjectRole) : null;
   }
+
+   async generateProjectDescription(
+    title: string,
+  ): Promise<string> {
+    try {
+      const completion =
+        await this.groq.chat.completions.create({
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You generate short project descriptions. Return exactly 2 short sentences. Do not use bullet points, headings, or quotation marks.',
+            },
+            {
+              role: 'user',
+              content: `Create a professional 2-sentence description for this project: ${title}`,
+            },
+          ],
+          model: 'llama-3.1-8b-instant',
+          temperature: 0.7,
+          max_tokens: 100,
+        });
+
+      return (
+        completion.choices[0]?.message?.content?.trim() ||
+        ''
+      );
+    } catch (error) {
+      console.error(
+        'Groq description generation failed:',
+        error,
+      );
+
+      throw new InternalServerErrorException(
+        'Failed to generate project description',
+      );
+    }
+  }
+
+
 }

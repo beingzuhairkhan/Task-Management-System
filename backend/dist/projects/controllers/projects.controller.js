@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const projects_service_1 = require("../services/projects.service");
 const create_project_dto_1 = require("../dto/create-project.dto");
 const update_project_dto_1 = require("../dto/update-project.dto");
+const generate_description_dto_1 = require("../dto/generate-description.dto");
 const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
 let ProjectsController = class ProjectsController {
@@ -38,6 +39,12 @@ let ProjectsController = class ProjectsController {
     }
     async remove(id, user) {
         await this.projectsService.remove(id, user._id);
+    }
+    async generateDescription(dto) {
+        const description = await this.projectsService.generateProjectDescription(dto.title);
+        return {
+            description,
+        };
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -94,6 +101,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ProjectsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('generate-description'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [generate_description_dto_1.GenerateDescriptionDto]),
+    __metadata("design:returntype", Promise)
+], ProjectsController.prototype, "generateDescription", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, common_1.Controller)('projects'),

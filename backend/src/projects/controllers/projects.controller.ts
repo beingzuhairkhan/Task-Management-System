@@ -13,8 +13,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ProjectsService } from '../services/projects.service';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
-import { InviteMemberDto } from '../dto/invite-member.dto';
-import { UpdateMemberRoleDto } from '../dto/update-member-role.dto';
+import { GenerateDescriptionDto } from '../dto/generate-description.dto';
 import {
   JwtAuthGuard,
   Auth,
@@ -72,34 +71,21 @@ export class ProjectsController {
     await this.projectsService.remove(id , user._id);
   }
 
-  // @Post(':id/members')
-  // @UseGuards(ProjectRolesGuard)
-  // @ProjectRoles(ProjectRole.OWNER)
-  // @ApiOperation({ summary: 'Invite a member to the project (owner only)' })
-  // @ApiResponse({ status: 200, description: 'Member invited' })
-  // inviteMember(@Param('id') id: string, @Body() dto: InviteMemberDto) {
-  //   return this.projectsService.inviteMember(id, dto);
-  // }
+   @Post('generate-description')
+  async generateDescription(
+    @Body() dto: GenerateDescriptionDto,
+  ) {
+    const description =
+      await this.projectsService.generateProjectDescription(
+        dto.title,
+      );
 
-  // @Patch(':id/members/:userId')
-  // @UseGuards(ProjectRolesGuard)
-  // @ProjectRoles(ProjectRole.OWNER)
-  // @ApiOperation({ summary: 'Update a member role (owner only)' })
-  // @ApiResponse({ status: 200, description: 'Member role updated' })
-  // updateMemberRole(
-  //   @Param('id') id: string,
-  //   @Param('userId') userId: string,
-  //   @Body() dto: UpdateMemberRoleDto,
-  // ) {
-  //   return this.projectsService.updateMemberRole(id, userId, dto);
-  // }
+    return {
+      description,
+    };
+  }
 
-  // @Delete(':id/members/:userId')
-  // @UseGuards(ProjectRolesGuard)
-  // @ProjectRoles(ProjectRole.OWNER)
-  // @ApiOperation({ summary: 'Remove a member from the project (owner only)' })
-  // @ApiResponse({ status: 200, description: 'Member removed' })
-  // removeMember(@Param('id') id: string, @Param('userId') userId: string) {
-  //   return this.projectsService.removeMember(id, userId);
-  // }
+
+
+
 }

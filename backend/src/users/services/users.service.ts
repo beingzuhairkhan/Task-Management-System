@@ -23,7 +23,9 @@ export class UsersService {
   ) {
     this.brevo = new BrevoClient({
       apiKey: this.configService.get<string>('BREVO_KEY')!,
-    })
+    });
+
+    
   }
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<any>> {

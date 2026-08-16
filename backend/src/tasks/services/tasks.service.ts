@@ -342,33 +342,7 @@ export class TasksService {
       );
     }
   }
-  // async assign(id: string, userId: string, assignerId: string) {
-  //   const existing = await this.taskRepository.findByIdLean(id);
-  //   if (!existing) throw new NotFoundException('Task', id);
 
-  //   const task = await this.taskRepository.addAssignee(id, userId);
-  //   await this.activityService.log({
-  //     taskId: id,
-  //     userId: assignerId,
-  //     action: ActivityAction.ASSIGNED,
-  //     newValue: userId,
-  //   });
-  //   return task;
-  // }
-
-  // async unassign(id: string, userId: string, unassignerId: string) {
-  //   const existing = await this.taskRepository.findByIdLean(id);
-  //   if (!existing) throw new NotFoundException('Task', id);
-
-  //   const task = await this.taskRepository.removeAssignee(id, userId);
-  //   await this.activityService.log({
-  //     taskId: id,
-  //     userId: unassignerId,
-  //     action: ActivityAction.UNASSIGNED,
-  //     oldValue: userId,
-  //   });
-  //   return task;
-  // }
 
   async remove(id: string, userId: string): Promise<void> {
     try {

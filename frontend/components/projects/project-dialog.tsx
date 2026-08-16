@@ -76,6 +76,8 @@ export function ProjectDialog({
   const [due, setDue] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [generatingDescription, setGeneratingDescription] =
+  useState(false);
 
   useEffect(() => {
     const loadMembers = async () => {
@@ -226,7 +228,37 @@ export function ProjectDialog({
   }
 };
 
+useEffect(() => {
+  // Don't generate description while editing
+  if (state?.mode !== "create") {
+    return;
+  }
 
+  const title = name.trim();
+
+  if (!title) {
+    setDescription("");
+    return;
+  }
+
+  const timer = setTimeout(async () => {
+    try {
+      setGeneratingDescription(true);
+
+      const response =
+        await projectAPI.generateDescription(title);
+
+      setDescription(
+        response.data?.description ?? ""
+      );
+    } catch (error) {
+    } finally {
+      setGeneratingDescription(false);
+    }
+  }, 800);
+
+  return () => clearTimeout(timer);
+}, [name, state?.mode]);
 
   const formattedDue = due
     ? new Date(due).toLocaleDateString("en-GB", {
@@ -257,36 +289,49 @@ export function ProjectDialog({
         </DialogHeader>
 
         <div className="grid gap-4">
-          <div className="grid gap-1.5">
-            <Label htmlFor="project-name">
-              Name
-            </Label>
+  <div className="grid gap-1.5">
+    <Label htmlFor="project-name">
+      Name
+    </Label>
 
-            <Input
-              id="project-name"
-              value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-              placeholder="Design homepage"
-            />
-          </div>
+    <Input
+      id="project-name"
+      value={name}
+      onChange={(e) =>
+        setName(e.target.value)
+      }
+      placeholder="Design homepage"
+    />
+  </div>
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="project-desc">
-              Description
-            </Label>
+  <div className="grid gap-1.5">
+    <div className="flex items-center justify-between">
+      <Label htmlFor="project-desc">
+        Description
+      </Label>
 
-            <Textarea
-              id="project-desc"
-              rows={3}
-              value={description}
-              onChange={(e) =>
-                setDescription(e.target.value)
-              }
-              placeholder="What is this project about?"
-            />
-          </div>
+      {generatingDescription && (
+        <span className="text-xs text-muted-foreground">
+          Generating...
+        </span>
+      )}
+    </div>
+
+    <Textarea
+      id="project-desc"
+      rows={3}
+      value={description}
+      onChange={(e) =>
+        setDescription(e.target.value)
+      }
+      placeholder={
+        generatingDescription
+          ? "Generating description..."
+          : "What is this project about?"
+      }
+    />
+  </div>
+
 
           <div className="grid grid-cols-2 gap-3">
             {/* Priority */}

@@ -11,6 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var ProjectsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectsService = void 0;
@@ -18,20 +21,26 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("mongoose");
 const project_repository_1 = require("../repositories/project.repository");
 const user_repository_1 = require("../../users/repositories/user.repository");
+const groq_sdk_1 = __importDefault(require("groq-sdk"));
 const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
 const mongoose_2 = require("@nestjs/mongoose");
 const user_schema_1 = require("../../users/schemas/user.schema");
 const subtask_schema_1 = require("../../subtasks/schemas/subtask.schema");
 const task_schema_1 = require("../../tasks/schemas/task.schema");
+const config_1 = require("@nestjs/config");
 let ProjectsService = ProjectsService_1 = class ProjectsService {
-    constructor(projectRepository, userRepository, userModel, substaskModel, taskModel) {
+    constructor(projectRepository, userRepository, userModel, substaskModel, taskModel, configService) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.userModel = userModel;
         this.substaskModel = substaskModel;
         this.taskModel = taskModel;
+        this.configService = configService;
         this.logger = new common_1.Logger(ProjectsService_1.name);
+        this.groq = new groq_sdk_1.default({
+            apiKey: this.configService.get('GROQ_API_KEY'),
+        });
     }
     async create(dto, userId) {
         try {
@@ -205,6 +214,31 @@ let ProjectsService = ProjectsService_1 = class ProjectsService {
         const member = project.members.find((m) => String(m.user) === String(userId));
         return member ? member.role : null;
     }
+    async generateProjectDescription(title) {
+        try {
+            const completion = await this.groq.chat.completions.create({
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You generate short project descriptions. Return exactly 2 short sentences. Do not use bullet points, headings, or quotation marks.',
+                    },
+                    {
+                        role: 'user',
+                        content: `Create a professional 2-sentence description for this project: ${title}`,
+                    },
+                ],
+                model: 'llama-3.1-8b-instant',
+                temperature: 0.7,
+                max_tokens: 100,
+            });
+            return (completion.choices[0]?.message?.content?.trim() ||
+                '');
+        }
+        catch (error) {
+            console.error('Groq description generation failed:', error);
+            throw new common_1.InternalServerErrorException('Failed to generate project description');
+        }
+    }
 };
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = ProjectsService_1 = __decorate([
@@ -216,6 +250,7 @@ exports.ProjectsService = ProjectsService = ProjectsService_1 = __decorate([
         user_repository_1.UserRepository,
         mongoose_1.Model,
         mongoose_1.Model,
-        mongoose_1.Model])
+        mongoose_1.Model,
+        config_1.ConfigService])
 ], ProjectsService);
 //# sourceMappingURL=projects.service.js.map

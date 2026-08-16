@@ -8,6 +8,7 @@ import { ProjectMiddleware } from './middleware/project.middleware';
 import { UsersModule } from 'src/users/users.module';
 import { Subtask , SubtaskSchema } from 'src/subtasks/schemas/subtask.schema';
 import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'Project', schema: ProjectSchema },
       {
@@ -19,7 +20,10 @@ import { Task, TaskSchema } from 'src/tasks/schemas/task.schema';
     schema: SubtaskSchema,
   },
   ]),
-    UsersModule
+    UsersModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectRepository, ProjectMiddleware],

@@ -37,7 +37,8 @@ const config = () => ({
             '',
     },
     redis: process.env.REDIS_URL,
-    BREVO_KEY: process.env.BREVO_API_KEY
+    BREVO_KEY: process.env.BREVO_API_KEY,
+    GROQ_KEY: process.env.GROQ_API_KEY
 });
 exports.config = config;
 //# sourceMappingURL=configuration.js.map

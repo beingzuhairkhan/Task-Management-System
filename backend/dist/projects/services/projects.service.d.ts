@@ -8,14 +8,17 @@ import { ProjectRole } from '../../common/enums';
 import { User } from '../../users/schemas/user.schema';
 import { Subtask } from 'src/subtasks/schemas/subtask.schema';
 import { Task } from 'src/tasks/schemas/task.schema';
+import { ConfigService } from '@nestjs/config';
 export declare class ProjectsService {
     private readonly projectRepository;
     private readonly userRepository;
     private readonly userModel;
     private substaskModel;
     private taskModel;
+    private readonly configService;
     private readonly logger;
-    constructor(projectRepository: ProjectRepository, userRepository: UserRepository, userModel: Model<User>, substaskModel: Model<Subtask>, taskModel: Model<Task>);
+    private readonly groq;
+    constructor(projectRepository: ProjectRepository, userRepository: UserRepository, userModel: Model<User>, substaskModel: Model<Subtask>, taskModel: Model<Task>, configService: ConfigService);
     create(dto: CreateProjectDto, userId: string): Promise<import("../schemas/project.schema").Project>;
     findAll(dto: PaginationDto, userId: string): Promise<PaginatedResult<any>>;
     findById(id: string): Promise<import("../schemas/project.schema").Project>;
@@ -23,4 +26,5 @@ export declare class ProjectsService {
     update(id: string, dto: UpdateProjectDto): Promise<any>;
     remove(id: string, userId: string): Promise<void>;
     getUserRole(projectId: string, userId: string): Promise<ProjectRole | null>;
+    generateProjectDescription(title: string): Promise<string>;
 }

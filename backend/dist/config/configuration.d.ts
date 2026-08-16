@@ -28,4 +28,5 @@ export declare const config: () => {
     };
     redis: string;
     BREVO_KEY: string;
+    GROQ_KEY: string;
 };

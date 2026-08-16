@@ -29,7 +29,7 @@ import {
 import { useTasks } from "@/lib/tasks-store";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { Calendar } from "../ui/calendar";
-import { labelAPI, taskAPI, userAPI } from "@/services/api";
+import { labelAPI, taskAPI, userAPI , projectAPI } from "@/services/api";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 export type TaskDialogState =
@@ -117,6 +117,8 @@ export function TaskDialog({
   const [newLabelName, setNewLabelName] = useState("");
   const [isAddingLabel, setIsAddingLabel] = useState(false);
   const params = useParams();
+  const [generatingDescription, setGeneratingDescription] =
+  useState(false);
 
   const projectId = params.projectId as string;
 
@@ -322,6 +324,43 @@ export function TaskDialog({
     }
   };
 
+  useEffect(() => {
+  if (!state || state.mode !== "create") {
+    return;
+  }
+
+  const taskTitle = title.trim();
+
+  if (!taskTitle) {
+    setDescription("");
+    return;
+  }
+
+  const timer = setTimeout(async () => {
+    try {
+      setGeneratingDescription(true);
+
+      const response =
+        await projectAPI.generateDescription(
+          taskTitle
+        );
+
+      setDescription(
+        response.data?.description ?? ""
+      );
+    } catch (error) {
+      console.error(
+        "Failed to generate description:",
+        error
+      );
+    } finally {
+      setGeneratingDescription(false);
+    }
+  }, 800);
+
+  return () => clearTimeout(timer);
+}, [title, state]);
+
   const formattedDue = due
     ? new Date(due).toLocaleDateString(
       "en-GB",
@@ -400,40 +439,46 @@ export function TaskDialog({
         </DialogHeader>
 
         <div className="grid gap-4">
-          {/* Title */}
-          <div className="grid gap-1.5">
-            <Label htmlFor="task-title">
-              Title
-            </Label>
+  {/* Title */}
+  <div className="grid gap-1.5">
+    <Label htmlFor="task-title">
+      Title
+    </Label>
 
-            <Input
-              id="task-title"
-              value={title}
-              onChange={(e) =>
-                setTitle(e.target.value)
-              }
-              placeholder="Write API documentation"
-            />
-          </div>
+    <Input
+      id="task-title"
+      value={title}
+      onChange={(e) =>
+        setTitle(e.target.value)
+      }
+      placeholder="Write API documentation"
+    />
+  </div>
 
-          {/* Description */}
-          <div className="grid gap-1.5">
-            <Label htmlFor="task-desc">
-              Description
-            </Label>
+  {/* Description */}
+  <div className="grid gap-1.5">
+    <div className="flex items-center justify-between">
+      <Label htmlFor="task-desc">
+        Description
+      </Label>
 
-            <Textarea
-              id="task-desc"
-              rows={3}
-              value={description}
-              onChange={(e) =>
-                setDescription(
-                  e.target.value,
-                )
-              }
-              placeholder="What needs to be done?"
-            />
-          </div>
+      {generatingDescription && (
+        <span className="text-xs text-muted-foreground">
+          Generating...
+        </span>
+      )}
+    </div>
+
+    <Textarea
+      id="task-desc"
+      rows={3}
+      value={description}
+      onChange={(e) =>
+        setDescription(e.target.value)
+      }
+      placeholder="What needs to be done?"
+    />
+  </div>
 
           {/* Group + Priority */}
           <div className="grid grid-cols-2 gap-3">

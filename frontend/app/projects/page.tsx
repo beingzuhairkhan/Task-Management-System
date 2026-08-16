@@ -419,11 +419,11 @@ export default function ProjectsPage() {
                             {p.name}
                           </button>
 
-                          {p.description && (
-                            <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                              {p.description}
-                            </p>
-                          )}
+                         {p.description && (
+  <p className="mt-0.5 max-w-[250px] truncate text-xs text-muted-foreground">
+    {p.description}
+  </p>
+)}
                         </td>
 
                         {shown("Priority") && (

@@ -249,27 +249,7 @@ export class TaskRepository {
       .exec();
   }
 
-  // async addAssignee(id: string, userId: string): Promise<Task | null> {
-  //   return this.taskModel
-  //     .findByIdAndUpdate(
-  //       id,
-  //       { $addToSet: { assignees: new Types.ObjectId(userId) } },
-  //       { new: true },
-  //     )
-  //     .populate('assignees', 'username email avatar')
-  //     .exec();
-  // }
 
-  // async removeAssignee(id: string, userId: string): Promise<Task | null> {
-  //   return this.taskModel
-  //     .findByIdAndUpdate(
-  //       id,
-  //       { $pull: { assignees: new Types.ObjectId(userId) } },
-  //       { new: true },
-  //     )
-  //     .populate('assignees', 'username email avatar')
-  //     .exec();
-  // }
 
 
   async delete(id: string): Promise<void> {
