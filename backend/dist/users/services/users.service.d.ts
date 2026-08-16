@@ -8,6 +8,7 @@ export declare class UsersService {
     private readonly configService;
     private readonly transporter;
     private readonly logger;
+    private readonly brevo;
     constructor(userRepository: UserRepository, configService: ConfigService);
     findAll(dto: PaginationDto): Promise<PaginatedResult<any>>;
     findById(id: string): Promise<import("../schemas/user.schema").User>;

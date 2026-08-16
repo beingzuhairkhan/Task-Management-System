@@ -17,7 +17,7 @@ import { BrevoClient } from '@getbrevo/brevo';
 export class UsersService {
   private readonly transporter: nodemailer.Transporter;
   private readonly logger = new Logger(UsersService.name);
-
+    private readonly brevo: BrevoClient;
   constructor(private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
   ) {
