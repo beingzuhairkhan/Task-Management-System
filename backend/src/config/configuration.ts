@@ -71,5 +71,6 @@ export const config = () => ({
     from:process.env.MAIL_USER ||
       '',
   },
-  redis:process.env.REDIS_URL 
+  redis:process.env.REDIS_URL ,
+  RESEND_KEY:process.env.RESEND_API_KEY
 });
