@@ -103,7 +103,7 @@ export function AppSidebar({ open, active }: AppSidebarProps) {
           open ? "w-60" : "w-0",
         )}
       >
-        <div className="flex h-full w-60 flex-col fixed">
+        <div className="flex h-screen w-60 flex-col">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2.5 border-b border-sidebar-border px-3 py-3 text-left transition-colors hover:bg-sidebar-accent">
               <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-avatar-violet text-[11px] font-bold text-avatar-violet-foreground">
