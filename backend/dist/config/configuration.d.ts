@@ -27,4 +27,5 @@ export declare const config: () => {
         from: string;
     };
     redis: string;
+    RESEND_KEY: string;
 };
