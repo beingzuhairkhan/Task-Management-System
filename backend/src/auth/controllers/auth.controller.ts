@@ -37,7 +37,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Initiate Google OAuth login' })
   googleAuth() {
-    // Passport handles the redirect to Google
+
   }
 
   @Get('google/callback')
@@ -78,15 +78,15 @@ export class AuthController {
     return this.authService.refreshAccessToken(refreshToken);
   }
 
-@Get('health')
-@Public()
-getHealth() {
-  return {
-    status: 'ok',
-    message: 'Auth API is healthy',
-    timestamp: new Date().toISOString(),
-  };
-}
+  @Get('health')
+  @Public()
+  getHealth() {
+    return {
+      status: 'ok',
+      message: 'Auth API is healthy',
+      timestamp: new Date().toISOString(),
+    };
+  }
 
 
   @Post('logout')

@@ -137,24 +137,6 @@ let ProjectRepository = class ProjectRepository {
             throw error;
         }
     }
-    async addMember(id, userId, role) {
-        return this.projectModel
-            .findByIdAndUpdate(id, { $addToSet: { members: { user: new mongoose_2.Types.ObjectId(userId), role } } }, { new: true })
-            .populate('members.user', 'username email avatar')
-            .exec();
-    }
-    async updateMemberRole(id, userId, role) {
-        return this.projectModel
-            .findOneAndUpdate({ _id: id, 'members.user': new mongoose_2.Types.ObjectId(userId) }, { $set: { 'members.$.role': role } }, { new: true })
-            .populate('members.user', 'username email avatar')
-            .exec();
-    }
-    async removeMember(id, userId) {
-        return this.projectModel
-            .findByIdAndUpdate(id, { $pull: { members: { user: new mongoose_2.Types.ObjectId(userId) } } }, { new: true })
-            .populate('members.user', 'username email avatar')
-            .exec();
-    }
     async delete(id) {
         const tasks = await this.taskModel
             .find({ projectId: new mongoose_2.Types.ObjectId(id) })

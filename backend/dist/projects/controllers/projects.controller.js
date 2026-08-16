@@ -18,8 +18,6 @@ const swagger_1 = require("@nestjs/swagger");
 const projects_service_1 = require("../services/projects.service");
 const create_project_dto_1 = require("../dto/create-project.dto");
 const update_project_dto_1 = require("../dto/update-project.dto");
-const invite_member_dto_1 = require("../dto/invite-member.dto");
-const update_member_role_dto_1 = require("../dto/update-member-role.dto");
 const common_2 = require("../../common");
 const enums_1 = require("../../common/enums");
 let ProjectsController = class ProjectsController {
@@ -40,15 +38,6 @@ let ProjectsController = class ProjectsController {
     }
     async remove(id, user) {
         await this.projectsService.remove(id, user._id);
-    }
-    inviteMember(id, dto) {
-        return this.projectsService.inviteMember(id, dto);
-    }
-    updateMemberRole(id, userId, dto) {
-        return this.projectsService.updateMemberRole(id, userId, dto);
-    }
-    removeMember(id, userId) {
-        return this.projectsService.removeMember(id, userId);
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -105,43 +94,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ProjectsController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Post)(':id/members'),
-    (0, common_1.UseGuards)(common_2.ProjectRolesGuard),
-    (0, common_2.ProjectRoles)(enums_1.ProjectRole.OWNER),
-    (0, swagger_1.ApiOperation)({ summary: 'Invite a member to the project (owner only)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Member invited' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, invite_member_dto_1.InviteMemberDto]),
-    __metadata("design:returntype", void 0)
-], ProjectsController.prototype, "inviteMember", null);
-__decorate([
-    (0, common_1.Patch)(':id/members/:userId'),
-    (0, common_1.UseGuards)(common_2.ProjectRolesGuard),
-    (0, common_2.ProjectRoles)(enums_1.ProjectRole.OWNER),
-    (0, swagger_1.ApiOperation)({ summary: 'Update a member role (owner only)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Member role updated' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('userId')),
-    __param(2, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, update_member_role_dto_1.UpdateMemberRoleDto]),
-    __metadata("design:returntype", void 0)
-], ProjectsController.prototype, "updateMemberRole", null);
-__decorate([
-    (0, common_1.Delete)(':id/members/:userId'),
-    (0, common_1.UseGuards)(common_2.ProjectRolesGuard),
-    (0, common_2.ProjectRoles)(enums_1.ProjectRole.OWNER),
-    (0, swagger_1.ApiOperation)({ summary: 'Remove a member from the project (owner only)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Member removed' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('userId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", void 0)
-], ProjectsController.prototype, "removeMember", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, common_1.Controller)('projects'),

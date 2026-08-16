@@ -18,8 +18,6 @@ export declare class TaskRepository {
     count(filter: FilterQuery<Task>): Promise<number>;
     update(id: string, data: UpdateTaskDto | Partial<Task>): Promise<Task | null>;
     move(id: string, group: string): Promise<Task | null>;
-    addAssignee(id: string, userId: string): Promise<Task | null>;
-    removeAssignee(id: string, userId: string): Promise<Task | null>;
     delete(id: string): Promise<void>;
     findManyByProject(projectId: string): Promise<Task[]>;
     buildFilter(projectId: string, filterDto: FilterTaskDto, search?: string, userId?: string, projectOwnerId?: Types.ObjectId, projectLeadId?: Types.ObjectId, subTaskTaskIds?: Types.ObjectId[]): FilterQuery<Task>;

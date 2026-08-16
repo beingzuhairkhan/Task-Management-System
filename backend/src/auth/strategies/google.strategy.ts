@@ -27,7 +27,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async authenticate(req: any, options?: any): Promise<void> {
-    // Override to handle missing client ID gracefully
     const clientId = this.configService.get<string>('google.clientId');
     if (!clientId) {
       throw new UnauthorizedException(

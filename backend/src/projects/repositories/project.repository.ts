@@ -164,46 +164,46 @@ export class ProjectRepository {
     }
   }
 
-  async addMember(
-    id: string,
-    userId: string,
-    role: string,
-  ): Promise<Project | null> {
-    return this.projectModel
-      .findByIdAndUpdate(
-        id,
-        { $addToSet: { members: { user: new Types.ObjectId(userId), role } } },
-        { new: true },
-      )
-      .populate('members.user', 'username email avatar')
-      .exec();
-  }
+  // async addMember(
+  //   id: string,
+  //   userId: string,
+  //   role: string,
+  // ): Promise<Project | null> {
+  //   return this.projectModel
+  //     .findByIdAndUpdate(
+  //       id,
+  //       { $addToSet: { members: { user: new Types.ObjectId(userId), role } } },
+  //       { new: true },
+  //     )
+  //     .populate('members.user', 'username email avatar')
+  //     .exec();
+  // }
 
-  async updateMemberRole(
-    id: string,
-    userId: string,
-    role: string,
-  ): Promise<Project | null> {
-    return this.projectModel
-      .findOneAndUpdate(
-        { _id: id, 'members.user': new Types.ObjectId(userId) },
-        { $set: { 'members.$.role': role } },
-        { new: true },
-      )
-      .populate('members.user', 'username email avatar')
-      .exec();
-  }
+  // async updateMemberRole(
+  //   id: string,
+  //   userId: string,
+  //   role: string,
+  // ): Promise<Project | null> {
+  //   return this.projectModel
+  //     .findOneAndUpdate(
+  //       { _id: id, 'members.user': new Types.ObjectId(userId) },
+  //       { $set: { 'members.$.role': role } },
+  //       { new: true },
+  //     )
+  //     .populate('members.user', 'username email avatar')
+  //     .exec();
+  // }
 
-  async removeMember(id: string, userId: string): Promise<Project | null> {
-    return this.projectModel
-      .findByIdAndUpdate(
-        id,
-        { $pull: { members: { user: new Types.ObjectId(userId) } } },
-        { new: true },
-      )
-      .populate('members.user', 'username email avatar')
-      .exec();
-  }
+  // async removeMember(id: string, userId: string): Promise<Project | null> {
+  //   return this.projectModel
+  //     .findByIdAndUpdate(
+  //       id,
+  //       { $pull: { members: { user: new Types.ObjectId(userId) } } },
+  //       { new: true },
+  //     )
+  //     .populate('members.user', 'username email avatar')
+  //     .exec();
+  // }
 
   async delete(id: string): Promise<void> {
     // Find all tasks belonging to this project

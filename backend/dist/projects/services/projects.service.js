@@ -196,42 +196,6 @@ let ProjectsService = ProjectsService_1 = class ProjectsService {
             throw new common_1.InternalServerErrorException('Failed to delete project');
         }
     }
-    async inviteMember(projectId, dto) {
-        const project = await this.projectRepository.findById(projectId);
-        if (!project)
-            throw new common_2.NotFoundException('Project', projectId);
-        const alreadyMember = project.members.some((m) => String(m.user) === String(dto.userId));
-        if (alreadyMember) {
-            throw new common_2.ConflictException('User is already a member of this project');
-        }
-        return this.projectRepository.addMember(projectId, dto.userId, dto.role);
-    }
-    async updateMemberRole(projectId, userId, dto) {
-        const project = await this.projectRepository.findById(projectId);
-        if (!project)
-            throw new common_2.NotFoundException('Project', projectId);
-        const member = project.members.find((m) => String(m.user) === String(userId));
-        if (!member) {
-            throw new common_2.NotFoundException('Member', userId);
-        }
-        if (member.role === enums_1.ProjectRole.OWNER) {
-            throw new common_2.ForbiddenException('Cannot change the role of the project owner');
-        }
-        const updated = await this.projectRepository.updateMemberRole(projectId, userId, dto.role);
-        return updated;
-    }
-    async removeMember(projectId, userId) {
-        const project = await this.projectRepository.findById(projectId);
-        if (!project)
-            throw new common_2.NotFoundException('Project', projectId);
-        const member = project.members.find((m) => String(m.user) === String(userId));
-        if (!member)
-            throw new common_2.NotFoundException('Member', userId);
-        if (member.role === enums_1.ProjectRole.OWNER) {
-            throw new common_2.ForbiddenException('Cannot remove the project owner');
-        }
-        return this.projectRepository.removeMember(projectId, userId);
-    }
     async getUserRole(projectId, userId) {
         const project = await this.projectRepository.findByIdLean(projectId);
         if (!project)

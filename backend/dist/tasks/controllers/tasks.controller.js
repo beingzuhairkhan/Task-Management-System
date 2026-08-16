@@ -20,7 +20,6 @@ const create_task_dto_1 = require("../dto/create-task.dto");
 const update_task_dto_1 = require("../dto/update-task.dto");
 const move_task_dto_1 = require("../dto/move-task.dto");
 const filter_task_dto_1 = require("../dto/filter-task.dto");
-const assign_task_dto_1 = require("../dto/assign-task.dto");
 const common_2 = require("../../common");
 let TasksController = class TasksController {
     constructor(tasksService) {
@@ -40,12 +39,6 @@ let TasksController = class TasksController {
     }
     move(id, dto, user) {
         return this.tasksService.move(id, dto, user._id);
-    }
-    assign(id, dto, user) {
-        return this.tasksService.assign(id, dto.userId, user._id);
-    }
-    unassign(id, userId, user) {
-        return this.tasksService.unassign(id, userId, user._id);
     }
     async remove(id, user) {
         await this.tasksService.remove(id, user._id);
@@ -107,28 +100,6 @@ __decorate([
     __metadata("design:paramtypes", [String, move_task_dto_1.MoveTaskDto, Object]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "move", null);
-__decorate([
-    (0, common_1.Post)(':id/assign'),
-    (0, swagger_1.ApiOperation)({ summary: 'Assign a user to a task' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User assigned' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_2.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, assign_task_dto_1.AssignTaskDto, Object]),
-    __metadata("design:returntype", void 0)
-], TasksController.prototype, "assign", null);
-__decorate([
-    (0, common_1.Delete)(':id/assign/:userId'),
-    (0, swagger_1.ApiOperation)({ summary: 'Remove an assignee from a task' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Assignee removed' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('userId')),
-    __param(2, (0, common_2.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Object]),
-    __metadata("design:returntype", void 0)
-], TasksController.prototype, "unassign", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a task' }),

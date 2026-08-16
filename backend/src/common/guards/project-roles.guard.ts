@@ -37,9 +37,9 @@ export class ProjectRolesGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    if (user.role === 'ADMIN') {
-      return true;
-    }
+    // if (user.role === 'ADMIN') {
+    //   return true;
+    // }
 
     const projectId = request.params.id;
 

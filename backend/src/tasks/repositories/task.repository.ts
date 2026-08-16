@@ -249,27 +249,27 @@ export class TaskRepository {
       .exec();
   }
 
-  async addAssignee(id: string, userId: string): Promise<Task | null> {
-    return this.taskModel
-      .findByIdAndUpdate(
-        id,
-        { $addToSet: { assignees: new Types.ObjectId(userId) } },
-        { new: true },
-      )
-      .populate('assignees', 'username email avatar')
-      .exec();
-  }
+  // async addAssignee(id: string, userId: string): Promise<Task | null> {
+  //   return this.taskModel
+  //     .findByIdAndUpdate(
+  //       id,
+  //       { $addToSet: { assignees: new Types.ObjectId(userId) } },
+  //       { new: true },
+  //     )
+  //     .populate('assignees', 'username email avatar')
+  //     .exec();
+  // }
 
-  async removeAssignee(id: string, userId: string): Promise<Task | null> {
-    return this.taskModel
-      .findByIdAndUpdate(
-        id,
-        { $pull: { assignees: new Types.ObjectId(userId) } },
-        { new: true },
-      )
-      .populate('assignees', 'username email avatar')
-      .exec();
-  }
+  // async removeAssignee(id: string, userId: string): Promise<Task | null> {
+  //   return this.taskModel
+  //     .findByIdAndUpdate(
+  //       id,
+  //       { $pull: { assignees: new Types.ObjectId(userId) } },
+  //       { new: true },
+  //     )
+  //     .populate('assignees', 'username email avatar')
+  //     .exec();
+  // }
 
 
   async delete(id: string): Promise<void> {
@@ -397,87 +397,4 @@ export class TaskRepository {
   return filter;
 }
 
-  // buildFilter(
-  //   projectId: string,
-  //   filterDto: FilterTaskDto,
-  //   search?: string,
-  //   userId?: string,
-  //   projectOwnerId?: Types.ObjectId,
-  //   projectLeadId?: Types.ObjectId,
-  // ): FilterQuery<Task> {
-  //   const filter: FilterQuery<Task> = {
-  //     projectId: new Types.ObjectId(projectId),
-  //   };
-
-  //   if (userId) {
-  //     const userObjectId = new Types.ObjectId(userId);
-
-  //     const isProjectOwner =
-  //       projectOwnerId &&
-  //       projectOwnerId.equals(userObjectId);
-
-  //     const isProjectLead =
-  //       projectLeadId &&
-  //       projectLeadId.equals(userObjectId);
-
-  //     // Project owner and project lead see ALL tasks
-  //     if (!isProjectOwner && !isProjectLead) {
-  //       filter.$or = [
-  //         { reporter: userObjectId },
-  //         { lead: userObjectId },
-  //         { members: userObjectId },
-  //       ];
-  //     }
-  //   }
-
-  //   if (filterDto.status) {
-  //     filter.status = filterDto.status;
-  //   }
-
-  //   if (filterDto.priority) {
-  //     filter.priority = filterDto.priority;
-  //   }
-
-  //   if (filterDto.group) {
-  //     filter.group = filterDto.group;
-  //   }
-
-  //   if (filterDto.members?.length) {
-  //     filter.members = {
-  //       $in: filterDto.members.map(
-  //         (id) => new Types.ObjectId(id),
-  //       ),
-  //     };
-  //   }
-
-  //   if (search) {
-  //     const accessFilter = filter.$or;
-
-  //     delete filter.$or;
-
-  //     filter.$and = [
-  //       ...(accessFilter
-  //         ? [{ $or: accessFilter }]
-  //         : []),
-  //       {
-  //         $or: [
-  //           {
-  //             title: {
-  //               $regex: search,
-  //               $options: 'i',
-  //             },
-  //           },
-  //           {
-  //             description: {
-  //               $regex: search,
-  //               $options: 'i',
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     ];
-  //   }
-
-  //   return filter;
-  // }
 }

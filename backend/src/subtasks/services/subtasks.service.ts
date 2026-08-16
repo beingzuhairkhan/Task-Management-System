@@ -143,11 +143,8 @@ export class SubtasksService {
 
         await this.activityService.log({
             taskId: String(subtask.taskId),
-
             userId,
-
             action: ActivityAction.STATUS_CHANGED,
-
             newValue:
                 changes ||
                 `Subtask: ${subtask.title}`,
@@ -182,12 +179,9 @@ export class SubtasksService {
       taskId: String(
         subtask.taskId,
       ),
-
       userId,
-
       action:
         ActivityAction.DELETED,
-
       newValue:
         `Subtask: ${subtask.title}`,
     });

@@ -72,34 +72,34 @@ export class ProjectsController {
     await this.projectsService.remove(id , user._id);
   }
 
-  @Post(':id/members')
-  @UseGuards(ProjectRolesGuard)
-  @ProjectRoles(ProjectRole.OWNER)
-  @ApiOperation({ summary: 'Invite a member to the project (owner only)' })
-  @ApiResponse({ status: 200, description: 'Member invited' })
-  inviteMember(@Param('id') id: string, @Body() dto: InviteMemberDto) {
-    return this.projectsService.inviteMember(id, dto);
-  }
+  // @Post(':id/members')
+  // @UseGuards(ProjectRolesGuard)
+  // @ProjectRoles(ProjectRole.OWNER)
+  // @ApiOperation({ summary: 'Invite a member to the project (owner only)' })
+  // @ApiResponse({ status: 200, description: 'Member invited' })
+  // inviteMember(@Param('id') id: string, @Body() dto: InviteMemberDto) {
+  //   return this.projectsService.inviteMember(id, dto);
+  // }
 
-  @Patch(':id/members/:userId')
-  @UseGuards(ProjectRolesGuard)
-  @ProjectRoles(ProjectRole.OWNER)
-  @ApiOperation({ summary: 'Update a member role (owner only)' })
-  @ApiResponse({ status: 200, description: 'Member role updated' })
-  updateMemberRole(
-    @Param('id') id: string,
-    @Param('userId') userId: string,
-    @Body() dto: UpdateMemberRoleDto,
-  ) {
-    return this.projectsService.updateMemberRole(id, userId, dto);
-  }
+  // @Patch(':id/members/:userId')
+  // @UseGuards(ProjectRolesGuard)
+  // @ProjectRoles(ProjectRole.OWNER)
+  // @ApiOperation({ summary: 'Update a member role (owner only)' })
+  // @ApiResponse({ status: 200, description: 'Member role updated' })
+  // updateMemberRole(
+  //   @Param('id') id: string,
+  //   @Param('userId') userId: string,
+  //   @Body() dto: UpdateMemberRoleDto,
+  // ) {
+  //   return this.projectsService.updateMemberRole(id, userId, dto);
+  // }
 
-  @Delete(':id/members/:userId')
-  @UseGuards(ProjectRolesGuard)
-  @ProjectRoles(ProjectRole.OWNER)
-  @ApiOperation({ summary: 'Remove a member from the project (owner only)' })
-  @ApiResponse({ status: 200, description: 'Member removed' })
-  removeMember(@Param('id') id: string, @Param('userId') userId: string) {
-    return this.projectsService.removeMember(id, userId);
-  }
+  // @Delete(':id/members/:userId')
+  // @UseGuards(ProjectRolesGuard)
+  // @ProjectRoles(ProjectRole.OWNER)
+  // @ApiOperation({ summary: 'Remove a member from the project (owner only)' })
+  // @ApiResponse({ status: 200, description: 'Member removed' })
+  // removeMember(@Param('id') id: string, @Param('userId') userId: string) {
+  //   return this.projectsService.removeMember(id, userId);
+  // }
 }

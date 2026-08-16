@@ -82,27 +82,27 @@ export class TasksController {
     return this.tasksService.move(id, dto, user._id);
   }
 
-  @Post(':id/assign')
-  @ApiOperation({ summary: 'Assign a user to a task' })
-  @ApiResponse({ status: 200, description: 'User assigned' })
-  assign(
-    @Param('id') id: string,
-    @Body() dto: AssignTaskDto,
-    @CurrentUser() user: any,
-  ) {
-    return this.tasksService.assign(id, dto.userId, user._id);
-  }
+  // @Post(':id/assign')
+  // @ApiOperation({ summary: 'Assign a user to a task' })
+  // @ApiResponse({ status: 200, description: 'User assigned' })
+  // assign(
+  //   @Param('id') id: string,
+  //   @Body() dto: AssignTaskDto,
+  //   @CurrentUser() user: any,
+  // ) {
+  //   return this.tasksService.assign(id, dto.userId, user._id);
+  // }
 
-  @Delete(':id/assign/:userId')
-  @ApiOperation({ summary: 'Remove an assignee from a task' })
-  @ApiResponse({ status: 200, description: 'Assignee removed' })
-  unassign(
-    @Param('id') id: string,
-    @Param('userId') userId: string,
-    @CurrentUser() user: any,
-  ) {
-    return this.tasksService.unassign(id, userId, user._id);
-  }
+  // @Delete(':id/assign/:userId')
+  // @ApiOperation({ summary: 'Remove an assignee from a task' })
+  // @ApiResponse({ status: 200, description: 'Assignee removed' })
+  // unassign(
+  //   @Param('id') id: string,
+  //   @Param('userId') userId: string,
+  //   @CurrentUser() user: any,
+  // ) {
+  //   return this.tasksService.unassign(id, userId, user._id);
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a task' })

@@ -261,52 +261,52 @@ export class ProjectsService {
     }
   }
 
-  async inviteMember(projectId: string, dto: InviteMemberDto) {
-    const project = await this.projectRepository.findById(projectId);
-    if (!project) throw new NotFoundException('Project', projectId);
+  // async inviteMember(projectId: string, dto: InviteMemberDto) {
+  //   const project = await this.projectRepository.findById(projectId);
+  //   if (!project) throw new NotFoundException('Project', projectId);
 
-    const alreadyMember = project.members.some(
-      (m) => String(m.user) === String(dto.userId),
-    );
-    if (alreadyMember) {
-      throw new ConflictException('User is already a member of this project');
-    }
+  //   const alreadyMember = project.members.some(
+  //     (m) => String(m.user) === String(dto.userId),
+  //   );
+  //   if (alreadyMember) {
+  //     throw new ConflictException('User is already a member of this project');
+  //   }
 
-    return this.projectRepository.addMember(projectId, dto.userId, dto.role);
-  }
+  //   return this.projectRepository.addMember(projectId, dto.userId, dto.role);
+  // }
 
-  async updateMemberRole(projectId: string, userId: string, dto: UpdateMemberRoleDto) {
-    const project = await this.projectRepository.findById(projectId);
-    if (!project) throw new NotFoundException('Project', projectId);
+  // async updateMemberRole(projectId: string, userId: string, dto: UpdateMemberRoleDto) {
+  //   const project = await this.projectRepository.findById(projectId);
+  //   if (!project) throw new NotFoundException('Project', projectId);
 
-    const member = project.members.find((m) => String(m.user) === String(userId));
-    if (!member) {
-      throw new NotFoundException('Member', userId);
-    }
-    if (member.role === ProjectRole.OWNER) {
-      throw new ForbiddenException('Cannot change the role of the project owner');
-    }
+  //   const member = project.members.find((m) => String(m.user) === String(userId));
+  //   if (!member) {
+  //     throw new NotFoundException('Member', userId);
+  //   }
+  //   if (member.role === ProjectRole.OWNER) {
+  //     throw new ForbiddenException('Cannot change the role of the project owner');
+  //   }
 
-    const updated = await this.projectRepository.updateMemberRole(
-      projectId,
-      userId,
-      dto.role,
-    );
-    return updated;
-  }
+  //   const updated = await this.projectRepository.updateMemberRole(
+  //     projectId,
+  //     userId,
+  //     dto.role,
+  //   );
+  //   return updated;
+  // }
 
-  async removeMember(projectId: string, userId: string) {
-    const project = await this.projectRepository.findById(projectId);
-    if (!project) throw new NotFoundException('Project', projectId);
+  // async removeMember(projectId: string, userId: string) {
+  //   const project = await this.projectRepository.findById(projectId);
+  //   if (!project) throw new NotFoundException('Project', projectId);
 
-    const member = project.members.find((m) => String(m.user) === String(userId));
-    if (!member) throw new NotFoundException('Member', userId);
-    if (member.role === ProjectRole.OWNER) {
-      throw new ForbiddenException('Cannot remove the project owner');
-    }
+  //   const member = project.members.find((m) => String(m.user) === String(userId));
+  //   if (!member) throw new NotFoundException('Member', userId);
+  //   if (member.role === ProjectRole.OWNER) {
+  //     throw new ForbiddenException('Cannot remove the project owner');
+  //   }
 
-    return this.projectRepository.removeMember(projectId, userId);
-  }
+  //   return this.projectRepository.removeMember(projectId, userId);
+  // }
 
   async getUserRole(projectId: string, userId: string): Promise<ProjectRole | null> {
     const project = await this.projectRepository.findByIdLean(projectId);

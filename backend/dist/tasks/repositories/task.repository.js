@@ -213,18 +213,6 @@ let TaskRepository = class TaskRepository {
             .findByIdAndUpdate(id, { group }, { new: true })
             .exec();
     }
-    async addAssignee(id, userId) {
-        return this.taskModel
-            .findByIdAndUpdate(id, { $addToSet: { assignees: new mongoose_2.Types.ObjectId(userId) } }, { new: true })
-            .populate('assignees', 'username email avatar')
-            .exec();
-    }
-    async removeAssignee(id, userId) {
-        return this.taskModel
-            .findByIdAndUpdate(id, { $pull: { assignees: new mongoose_2.Types.ObjectId(userId) } }, { new: true })
-            .populate('assignees', 'username email avatar')
-            .exec();
-    }
     async delete(id) {
         await this.substaskModel
             .deleteMany({

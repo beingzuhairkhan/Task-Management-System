@@ -255,32 +255,6 @@ let TasksService = class TasksService {
             throw new common_1.InternalServerErrorException(error instanceof Error ? error.message : "Failed to move task");
         }
     }
-    async assign(id, userId, assignerId) {
-        const existing = await this.taskRepository.findByIdLean(id);
-        if (!existing)
-            throw new common_2.NotFoundException('Task', id);
-        const task = await this.taskRepository.addAssignee(id, userId);
-        await this.activityService.log({
-            taskId: id,
-            userId: assignerId,
-            action: enums_1.ActivityAction.ASSIGNED,
-            newValue: userId,
-        });
-        return task;
-    }
-    async unassign(id, userId, unassignerId) {
-        const existing = await this.taskRepository.findByIdLean(id);
-        if (!existing)
-            throw new common_2.NotFoundException('Task', id);
-        const task = await this.taskRepository.removeAssignee(id, userId);
-        await this.activityService.log({
-            taskId: id,
-            userId: unassignerId,
-            action: enums_1.ActivityAction.UNASSIGNED,
-            oldValue: userId,
-        });
-        return task;
-    }
     async remove(id, userId) {
         try {
             const existing = await this.taskRepository.findById(id);

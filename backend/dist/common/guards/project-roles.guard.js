@@ -31,9 +31,6 @@ let ProjectRolesGuard = ProjectRolesGuard_1 = class ProjectRolesGuard {
         if (!user) {
             throw new common_1.ForbiddenException('User not authenticated');
         }
-        if (user.role === 'ADMIN') {
-            return true;
-        }
         const projectId = request.params.id;
         if (!projectId) {
             throw new common_1.ForbiddenException('Project ID is required');

@@ -155,7 +155,6 @@ export class TasksService {
         );
       }
 
-      // Log title change
       if (dto.title !== undefined && dto.title !== existing.title) {
         await this.activityService.log({
           taskId: id,
@@ -166,7 +165,6 @@ export class TasksService {
         });
       }
 
-      // Log description change
       if (
         dto.description !== undefined &&
         dto.description !== existing.description
@@ -180,7 +178,6 @@ export class TasksService {
         });
       }
 
-      // Log reporter change
       if (
         dto.reporter !== undefined &&
         String(dto.reporter) !== String(existing.reporter)
@@ -194,7 +191,6 @@ export class TasksService {
         });
       }
 
-      // Log status change
       if (dto.status !== undefined && dto.status !== existing.status) {
         await this.activityService.log({
           taskId: id,
@@ -205,7 +201,6 @@ export class TasksService {
         });
       }
 
-      // Log priority change
       if (dto.priority !== undefined && dto.priority !== existing.priority) {
         await this.activityService.log({
           taskId: id,
@@ -347,33 +342,33 @@ export class TasksService {
       );
     }
   }
-  async assign(id: string, userId: string, assignerId: string) {
-    const existing = await this.taskRepository.findByIdLean(id);
-    if (!existing) throw new NotFoundException('Task', id);
+  // async assign(id: string, userId: string, assignerId: string) {
+  //   const existing = await this.taskRepository.findByIdLean(id);
+  //   if (!existing) throw new NotFoundException('Task', id);
 
-    const task = await this.taskRepository.addAssignee(id, userId);
-    await this.activityService.log({
-      taskId: id,
-      userId: assignerId,
-      action: ActivityAction.ASSIGNED,
-      newValue: userId,
-    });
-    return task;
-  }
+  //   const task = await this.taskRepository.addAssignee(id, userId);
+  //   await this.activityService.log({
+  //     taskId: id,
+  //     userId: assignerId,
+  //     action: ActivityAction.ASSIGNED,
+  //     newValue: userId,
+  //   });
+  //   return task;
+  // }
 
-  async unassign(id: string, userId: string, unassignerId: string) {
-    const existing = await this.taskRepository.findByIdLean(id);
-    if (!existing) throw new NotFoundException('Task', id);
+  // async unassign(id: string, userId: string, unassignerId: string) {
+  //   const existing = await this.taskRepository.findByIdLean(id);
+  //   if (!existing) throw new NotFoundException('Task', id);
 
-    const task = await this.taskRepository.removeAssignee(id, userId);
-    await this.activityService.log({
-      taskId: id,
-      userId: unassignerId,
-      action: ActivityAction.UNASSIGNED,
-      oldValue: userId,
-    });
-    return task;
-  }
+  //   const task = await this.taskRepository.removeAssignee(id, userId);
+  //   await this.activityService.log({
+  //     taskId: id,
+  //     userId: unassignerId,
+  //     action: ActivityAction.UNASSIGNED,
+  //     oldValue: userId,
+  //   });
+  //   return task;
+  // }
 
   async remove(id: string, userId: string): Promise<void> {
     try {

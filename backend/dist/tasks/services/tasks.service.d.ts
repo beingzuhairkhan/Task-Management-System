@@ -20,7 +20,5 @@ export declare class TasksService {
     findById(id: string): Promise<any>;
     update(id: string, dto: UpdateTaskDto, userId: string): Promise<Task>;
     move(id: string, dto: MoveTaskDto, userId: string): Promise<Task>;
-    assign(id: string, userId: string, assignerId: string): Promise<Task>;
-    unassign(id: string, userId: string, unassignerId: string): Promise<Task>;
     remove(id: string, userId: string): Promise<void>;
 }
