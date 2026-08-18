@@ -296,7 +296,7 @@ export class ProjectsService {
               content: `Create a professional 2-sentence description for this project: ${title}`,
             },
           ],
-          model: 'llama-3.1-8b-instant',
+          model: 'openai/gpt-oss-20b',
           temperature: 0.7,
           max_tokens: 100,
         });
