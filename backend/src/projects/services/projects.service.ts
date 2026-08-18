@@ -24,16 +24,16 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
-    private readonly groq: Groq;
+  private readonly groq: Groq;
   constructor(
     private readonly projectRepository: ProjectRepository,
     private readonly userRepository: UserRepository,
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
-       @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
-       @InjectModel(Task.name) private taskModel: Model<Task>,
-         private readonly configService: ConfigService,
-  ) { 
+    @InjectModel(Subtask.name) private substaskModel: Model<Subtask>,
+    @InjectModel(Task.name) private taskModel: Model<Task>,
+    private readonly configService: ConfigService,
+  ) {
     this.groq = new Groq({
       apiKey: this.configService.get<string>(
         'GROQ_API_KEY',
@@ -83,138 +83,138 @@ export class ProjectsService {
 
 
   async findAll(
-  dto: PaginationDto,
-  userId: string,
-): Promise<PaginatedResult<any>> {
-  try {
-    const userObjectId = new Types.ObjectId(userId);
+    dto: PaginationDto,
+    userId: string,
+  ): Promise<PaginatedResult<any>> {
+    try {
+      const userObjectId = new Types.ObjectId(userId);
 
-    const taskProjectIds = await this.taskModel.distinct('projectId', {
-      $or: [
-        { ownerId: userObjectId },
-        { reporter: userObjectId },
-        { members: userObjectId },
-      ],
-    });
+      const taskProjectIds = await this.taskModel.distinct('projectId', {
+        $or: [
+          { ownerId: userObjectId },
+          { reporter: userObjectId },
+          { members: userObjectId },
+        ],
+      });
 
-    const subtaskProjectResult = await this.substaskModel.aggregate([
-      {
-        $match: {
-          subMembers: userObjectId,
-        },
-      },
-
-      {
-        $lookup: {
-          from: 'tasks',
-          localField: 'taskId',
-          foreignField: '_id',
-          as: 'task',
-        },
-      },
-
-      {
-        $unwind: '$task',
-      },
-
-      {
-        $group: {
-          _id: null,
-          projectIds: {
-            $addToSet: '$task.projectId',
+      const subtaskProjectResult = await this.substaskModel.aggregate([
+        {
+          $match: {
+            subMembers: userObjectId,
           },
         },
-      },
-    ]);
 
-    const subtaskProjectIds =
-      subtaskProjectResult[0]?.projectIds || [];
-
-
-    const accessibleProjectIds = [
-      ...taskProjectIds,
-      ...subtaskProjectIds,
-    ];
-
-    const baseFilter = {
-      $or: [
-        // Project owner
         {
-          owner: userObjectId,
-        },
-
-        // Project lead
-        {
-          lead: userObjectId,
-        },
-
-        // Project member
-        {
-          'members.user': userObjectId,
-        },
-
-        // User belongs to task/subtask
-        {
-          _id: {
-            $in: accessibleProjectIds,
+          $lookup: {
+            from: 'tasks',
+            localField: 'taskId',
+            foreignField: '_id',
+            as: 'task',
           },
         },
-      ],
-    };
 
-    const searchFilter = buildSearchFilter(
-      dto.search,
-      ['title', 'description'],
-    );
+        {
+          $unwind: '$task',
+        },
 
-    const filters: any[] = [baseFilter];
+        {
+          $group: {
+            _id: null,
+            projectIds: {
+              $addToSet: '$task.projectId',
+            },
+          },
+        },
+      ]);
 
-    if (searchFilter.$or) {
-      filters.push(searchFilter);
-    }
-
-    if (dto.priority) {
-      filters.push({
-        priority: dto.priority,
-      });
-    }
+      const subtaskProjectIds =
+        subtaskProjectResult[0]?.projectIds || [];
 
 
-    if (dto.status) {
-      filters.push({
-        status: dto.status,
-      });
-    }
+      const accessibleProjectIds = [
+        ...taskProjectIds,
+        ...subtaskProjectIds,
+      ];
 
-    const filter =
-      filters.length === 1
-        ? baseFilter
-        : {
+      const baseFilter = {
+        $or: [
+          // Project owner
+          {
+            owner: userObjectId,
+          },
+
+          // Project lead
+          {
+            lead: userObjectId,
+          },
+
+          // Project member
+          {
+            'members.user': userObjectId,
+          },
+
+          // User belongs to task/subtask
+          {
+            _id: {
+              $in: accessibleProjectIds,
+            },
+          },
+        ],
+      };
+
+      const searchFilter = buildSearchFilter(
+        dto.search,
+        ['title', 'description'],
+      );
+
+      const filters: any[] = [baseFilter];
+
+      if (searchFilter.$or) {
+        filters.push(searchFilter);
+      }
+
+      if (dto.priority) {
+        filters.push({
+          priority: dto.priority,
+        });
+      }
+
+
+      if (dto.status) {
+        filters.push({
+          status: dto.status,
+        });
+      }
+
+      const filter =
+        filters.length === 1
+          ? baseFilter
+          : {
             $and: filters,
           };
 
-    const sort = buildSortOption(dto.sort);
+      const sort = buildSortOption(dto.sort);
 
-    const page = dto.page || 1;
-    const limit = dto.limit || 20;
-    const skip = (page - 1) * limit;
+      const page = dto.page || 1;
+      const limit = dto.limit || 20;
+      const skip = (page - 1) * limit;
 
-    const [projects, total] = await Promise.all([
-      this.projectRepository.findAll(
-        filter,
-        sort,
-        skip,
-        limit,
-      ),
+      const [projects, total] = await Promise.all([
+        this.projectRepository.findAll(
+          filter,
+          sort,
+          skip,
+          limit,
+        ),
 
-      this.projectRepository.count(filter),
-    ]);
+        this.projectRepository.count(filter),
+      ]);
 
-    return paginateResult(projects, total, dto);
-  } catch (err) {
-    throw err;
+      return paginateResult(projects, total, dto);
+    } catch (err) {
+      throw err;
+    }
   }
-}
 
   async findById(id: string) {
     const project = await this.projectRepository.findById(id);
@@ -279,7 +279,7 @@ export class ProjectsService {
     return member ? (member.role as ProjectRole) : null;
   }
 
-   async generateProjectDescription(
+  async generateProjectDescription(
     title: string,
   ): Promise<string> {
     try {
@@ -298,13 +298,14 @@ export class ProjectsService {
           ],
           model: 'openai/gpt-oss-20b',
           temperature: 0.7,
-          max_tokens: 100,
+          reasoning_effort: "low",
+          max_completion_tokens: 300,
         });
-        console.log("Groq response:", completion);
-console.log(
-  "GROQ CONTENT:",
-  completion.choices?.[0]?.message?.content
-);
+      console.log("Groq response:", completion);
+      console.log(
+        "GROQ CONTENT:",
+        completion.choices?.[0]?.message?.content
+      );
 
       return (
         completion.choices[0]?.message?.content?.trim() ||
