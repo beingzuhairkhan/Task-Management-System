@@ -301,11 +301,6 @@ export class ProjectsService {
           reasoning_effort: "low",
           max_completion_tokens: 300,
         });
-      console.log("Groq response:", completion);
-      console.log(
-        "GROQ CONTENT:",
-        completion.choices?.[0]?.message?.content
-      );
 
       return (
         completion.choices[0]?.message?.content?.trim() ||
