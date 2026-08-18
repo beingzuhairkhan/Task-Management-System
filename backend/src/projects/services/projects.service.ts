@@ -300,6 +300,11 @@ export class ProjectsService {
           temperature: 0.7,
           max_tokens: 100,
         });
+        console.log("Groq response:", completion);
+console.log(
+  "GROQ CONTENT:",
+  completion.choices?.[0]?.message?.content
+);
 
       return (
         completion.choices[0]?.message?.content?.trim() ||
